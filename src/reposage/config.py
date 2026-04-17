@@ -38,3 +38,15 @@ class ScanConfig:
 
 
 DEFAULT_SCAN_CONFIG = ScanConfig()
+
+
+@dataclass(frozen=True, slots=True)
+class EnrichConfig:
+    """Configuration for optional AI enrichment."""
+
+    model: str = "claude-haiku-4-5-20251001"
+    timeout_seconds: int = 30
+    max_debt_items: int = 5
+
+
+DEFAULT_ENRICH_CONFIG = EnrichConfig()

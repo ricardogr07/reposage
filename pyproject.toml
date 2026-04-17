@@ -36,6 +36,9 @@ dev = [
   "ruff>=0.11",
   "tox>=4.27",
 ]
+ai = [
+  "anthropic>=0.40",
+]
 
 [project.scripts]
 reposage = "reposage.cli:main"
@@ -53,6 +56,11 @@ dev = [
   "pytest-cov>=6.0",
   "ruff>=0.11",
   "tox>=4.27",
+]
+ai = [
+  "anthropic>=0.40",
+  "pytest>=8.3",
+  "pytest-cov>=6.0",
 ]
 
 [tool.hatch.build.targets.wheel]
