@@ -50,9 +50,7 @@ def test_is_test_file_ignores_non_code_extensions() -> None:
     "lint_config_name",
     ["eslint.config.js", "eslint.config.mjs", "eslint.config.cjs"],
 )
-def test_eslint_v9_flat_config_files_count_as_lint_signals(
-    tmp_path, lint_config_name: str
-) -> None:
+def test_eslint_v9_flat_config_files_count_as_lint_signals(tmp_path, lint_config_name: str) -> None:
     (tmp_path / lint_config_name).write_text("export default [];\n", encoding="utf-8")
 
     report = build_audit_report(tmp_path)
@@ -82,6 +80,4 @@ def test_dependency_surface_risk_uses_configured_threshold(tmp_path: Path) -> No
         ScanConfig(dependency_count_risk_threshold=2),
     )
 
-    assert any(
-        item.title == "Dependency surface area is growing" for item in report.risk.items
-    )
+    assert any(item.title == "Dependency surface area is growing" for item in report.risk.items)

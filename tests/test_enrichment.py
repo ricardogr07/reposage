@@ -23,9 +23,7 @@ from tests.conftest import fixture_path
 # ---------------------------------------------------------------------------
 
 
-def _make_enrichment(
-    roles: int = 1, debts: int = 1, improvements: int = 5
-) -> EnrichmentResult:
+def _make_enrichment(roles: int = 1, debts: int = 1, improvements: int = 5) -> EnrichmentResult:
     return EnrichmentResult(
         module_roles=[
             ModuleRole(module=f"src/mod{i}", responsibility="does things", layer="domain")
@@ -208,9 +206,7 @@ def test_anthropic_enricher_returns_enrichment_result() -> None:
     from reposage.enrichment.anthropic_provider import AnthropicEnricher
 
     tool_input: dict[str, Any] = {
-        "module_roles": [
-            {"module": "src/foo", "responsibility": "core logic", "layer": "domain"}
-        ],
+        "module_roles": [{"module": "src/foo", "responsibility": "core logic", "layer": "domain"}],
         "debt_items": [
             {
                 "title": "Missing tests",
@@ -391,13 +387,10 @@ def test_cli_enrich_produces_enriched_markdown(tmp_path: Any) -> None:
 
     out_file = tmp_path / "report.md"
     tool_input: dict[str, Any] = {
-        "module_roles": [
-            {"module": "src/x", "responsibility": "handles x", "layer": "domain"}
-        ],
+        "module_roles": [{"module": "src/x", "responsibility": "handles x", "layer": "domain"}],
         "debt_items": [],
         "top_improvements": [
-            {"rank": i + 1, "title": f"T{i}", "rationale": "R.", "effort": "low"}
-            for i in range(5)
+            {"rank": i + 1, "title": f"T{i}", "rationale": "R.", "effort": "low"} for i in range(5)
         ],
     }
     fake_anthropic = _make_fake_anthropic_module(tool_input)

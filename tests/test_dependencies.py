@@ -115,8 +115,7 @@ def test_parse_pyproject_collects_optional_and_poetry_group_dependencies(
 
     dependencies = _parse_pyproject(pyproject_path, "pyproject.toml")
     parsed = {
-        (dependency.name, dependency.version_spec, dependency.group)
-        for dependency in dependencies
+        (dependency.name, dependency.version_spec, dependency.group) for dependency in dependencies
     }
 
     assert ("requests", ">=2.0", "runtime") in parsed
