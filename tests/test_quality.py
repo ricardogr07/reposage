@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+
 from reposage.analysis.tests import detect_test_files
 from reposage.models import FileRecord
 from reposage.pipeline import build_audit_report
@@ -38,3 +40,18 @@ def test_is_test_file_ignores_non_code_extensions() -> None:
     result = detect_test_files(records)
 
     assert result == ["test_service.py"]
+
+
+@pytest.mark.parametrize(
+    "lint_config_name",
+    ["eslint.config.js", "eslint.config.mjs", "eslint.config.cjs"],
+)
+def test_eslint_v9_flat_config_files_count_as_lint_signals(
+    tmp_path, lint_config_name: str
+) -> None:
+    (tmp_path / lint_config_name).write_text("export default [];\n", encoding="utf-8")
+
+    report = build_audit_report(tmp_path)
+
+    assert report.quality.lint_present is True
+    assert report.quality.lint_files == [lint_config_name]

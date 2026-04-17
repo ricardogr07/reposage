@@ -10,7 +10,15 @@ from reposage.models import FileRecord, QualitySignals
 
 CI_FILE_NAMES = {".gitlab-ci.yml", "azure-pipelines.yml"}
 PACKAGING_FILES = {"pyproject.toml", "package.json", "setup.cfg", "setup.py"}
-LINT_FILE_NAMES = {".eslintrc", ".eslintrc.json", ".ruff.toml", "ruff.toml"}
+LINT_FILE_NAMES = {
+    ".eslintrc",
+    ".eslintrc.json",
+    "eslint.config.js",
+    "eslint.config.mjs",
+    "eslint.config.cjs",
+    ".ruff.toml",
+    "ruff.toml",
+}
 TYPE_FILE_NAMES = {"mypy.ini", "pyrightconfig.json", "py.typed", "tsconfig.json"}
 
 
