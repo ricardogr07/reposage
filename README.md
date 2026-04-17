@@ -18,18 +18,59 @@ Markdown or JSON audit report.
 - Markdown and JSON output
 - Optional AI enrichment only after deterministic extraction
 
+## Quick start
+
+```bash
+pip install reposage
+
+# Human-readable Markdown report (stdout)
+reposage run /path/to/repo
+
+# Explicit format and file output
+reposage report /path/to/repo --format markdown --output audit.md
+reposage report /path/to/repo --format json --output audit.json
+
+# With AI enrichment (module roles, debt items, top-5 improvements)
+pip install 'reposage[ai]'
+ANTHROPIC_API_KEY=sk-ant-... reposage report /path/to/repo --enrich
+```
+
 ## Commands
 
 ```bash
-reposage scan PATH
 reposage report PATH --format markdown
 reposage report PATH --format json
 reposage run PATH
 ```
 
-`scan` emits JSON to stdout by default. `report` supports explicit Markdown or
-JSON output. `run` is a convenience alias for the human-readable Markdown
-report.
+`report` supports explicit Markdown or JSON output. `run` is a convenience alias
+for the human-readable Markdown report. Pass `--output FILE` to write to a file
+instead of stdout. Pass `--enrich` to add AI-generated module roles, debt items,
+and top-5 improvements (requires `reposage[ai]` and `ANTHROPIC_API_KEY`).
+
+## GitHub Action
+
+Add RepoSage to any workflow to audit your repository on every push:
+
+```yaml
+- uses: actions/setup-python@v5
+  with:
+    python-version: "3.12"
+
+- uses: ricardogr07/reposage@v0.2.0
+  with:
+    path: .
+    format: markdown
+    output: reposage-report.md
+
+- uses: actions/upload-artifact@v4
+  with:
+    name: reposage-report
+    path: reposage-report.md
+```
+
+See [`.github/workflows/demo.yml`](.github/workflows/demo.yml) for a complete
+example, and [`examples/`](examples/) for sample audit outputs.
 
 ## Development
 
@@ -51,12 +92,15 @@ same `tox` commands.
 ## Project documents
 
 - [PLAN.md](PLAN.md): roadmap, issue backlog, PR strategy, and acceptance criteria
+- [CHANGELOG.md](CHANGELOG.md): version history
 - [docs/architecture.md](docs/architecture.md): package and data-flow overview
 - [docs/development.md](docs/development.md): contributor workflow and quality gates
 - [CONTRIBUTING.md](CONTRIBUTING.md): contribution and review expectations
+- [examples/](examples/): sample audit outputs
 
 ## Status
 
-This repository contains the bootstrap baseline plus a deterministic Sprint 1
-audit pipeline. AI enrichment remains optional and is intentionally separated
-from the extraction layer.
+M0 (bootstrap), M1 (deterministic audit), and M2 (AI enrichment) are complete.
+M3 (productization) adds release automation, a GitHub Action wrapper, and
+examples. AI enrichment remains optional and is intentionally separated from the
+extraction layer.

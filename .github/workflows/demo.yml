@@ -1,0 +1,34 @@
+name: RepoSage Demo
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  audit:
+    name: Audit repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run RepoSage
+        uses: ricardogr07/reposage@main
+        with:
+          path: .
+          format: markdown
+          output: reposage-report.md
+
+      - name: Upload audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: reposage-report
+          path: reposage-report.md
+          retention-days: 30

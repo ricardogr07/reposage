@@ -1,0 +1,66 @@
+name: RepoSage Audit
+description: Run a deterministic repository audit with optional AI enrichment.
+author: RepoSage contributors
+
+branding:
+  icon: search
+  color: blue
+
+inputs:
+  path:
+    description: Path to the repository root to audit.
+    default: .
+  format:
+    description: Output format — markdown or json.
+    default: markdown
+  output:
+    description: File path to write the report. Defaults to reposage-report.md.
+    default: reposage-report.md
+  enrich:
+    description: >
+      Enable AI enrichment (module roles, debt items, top-5 improvements).
+      Requires anthropic-api-key and installs reposage[ai].
+    default: "false"
+  anthropic-api-key:
+    description: Anthropic API key. Required when enrich is true.
+    required: false
+  version:
+    description: RepoSage version to install (e.g. "0.2.0"). Defaults to latest.
+    default: ""
+
+outputs:
+  report-path:
+    description: Path to the generated report file.
+    value: ${{ steps.run-audit.outputs.report-path }}
+
+runs:
+  using: composite
+  steps:
+    - name: Install RepoSage
+      shell: bash
+      run: |
+        VERSION_SPEC=""
+        if [ -n "${{ inputs.version }}" ]; then
+          VERSION_SPEC="==${{ inputs.version }}"
+        fi
+        if [ "${{ inputs.enrich }}" = "true" ]; then
+          pip install "reposage[ai]${VERSION_SPEC}"
+        else
+          pip install "reposage${VERSION_SPEC}"
+        fi
+
+    - name: Run audit
+      id: run-audit
+      shell: bash
+      env:
+        ANTHROPIC_API_KEY: ${{ inputs.anthropic-api-key }}
+      run: |
+        ENRICH_FLAG=""
+        if [ "${{ inputs.enrich }}" = "true" ]; then
+          ENRICH_FLAG="--enrich"
+        fi
+        reposage report "${{ inputs.path }}" \
+          --format "${{ inputs.format }}" \
+          --output "${{ inputs.output }}" \
+          $ENRICH_FLAG
+        echo "report-path=${{ inputs.output }}" >> "$GITHUB_OUTPUT"
