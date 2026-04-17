@@ -41,8 +41,8 @@ dev = [
 reposage = "reposage.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/example/reposage"
-Issues = "https://github.com/example/reposage/issues"
+Homepage = "https://github.com/ricardogr07/reposage"
+Issues = "https://github.com/ricardogr07/reposage/issues"
 
 [dependency-groups]
 dev = [
