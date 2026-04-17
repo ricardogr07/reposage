@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from reposage.analysis.tests import detect_test_files
+from reposage.models import FileRecord
 from reposage.pipeline import build_audit_report
 from tests.conftest import fixture_path
 
@@ -22,3 +24,17 @@ def test_monorepo_fixture_notes_multiple_manifest_roots() -> None:
     report = build_audit_report(fixture_path("monorepo_repo"))
 
     assert any("monorepo" in note.lower() for note in report.architecture.architecture_notes)
+
+
+def test_is_test_file_ignores_non_code_extensions() -> None:
+    records = [
+        FileRecord(path="test_data.csv", extension=".csv", size_bytes=100, line_count=5),
+        FileRecord(path="test_readme.md", extension=".md", size_bytes=200, line_count=10),
+        FileRecord(path="test_fixtures.json", extension=".json", size_bytes=50, line_count=3),
+        FileRecord(path="test_output.txt", extension=".txt", size_bytes=30, line_count=2),
+        FileRecord(path="test_service.py", extension=".py", size_bytes=300, line_count=20),
+    ]
+
+    result = detect_test_files(records)
+
+    assert result == ["test_service.py"]

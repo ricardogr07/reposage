@@ -8,6 +8,8 @@ from reposage.models import FileRecord
 
 TEST_DIRECTORY_NAMES = {"__tests__", "spec", "specs", "test", "tests"}
 
+TEST_EXTENSIONS = {".py", ".ts", ".tsx", ".js", ".jsx", ".rb", ".go", ".rs", ".java"}
+
 
 def detect_test_files(file_records: list[FileRecord]) -> list[str]:
     """Return file paths that look like automated tests."""
@@ -21,6 +23,8 @@ def detect_test_files(file_records: list[FileRecord]) -> list[str]:
 
 def _is_test_file(path: str) -> bool:
     pure_path = PurePosixPath(path)
+    if pure_path.suffix.lower() not in TEST_EXTENSIONS:
+        return False
     if any(part.lower() in TEST_DIRECTORY_NAMES for part in pure_path.parts):
         return True
     file_name = pure_path.name.lower()
