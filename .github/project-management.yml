@@ -1,44 +1,5 @@
-milestones:
-  - title: M0 Bootstrap
-    description: Bootstrap the public package, docs, CI, and GitHub hygiene.
-  - title: M1 Deterministic Audit
-    description: Ship the deterministic repository audit pipeline.
-  - title: M2 AI Enrichment
-    description: Layer optional enrichment on deterministic outputs.
-  - title: M3 Productization
-    description: Publish examples, release polish, and GitHub Action support.
-
-labels:
-  - name: type:feature
-    color: "0E8A16"
-  - name: type:bug
-    color: "D73A4A"
-  - name: type:chore
-    color: "5319E7"
-  - name: type:docs
-    color: "1D76DB"
-  - name: type:test
-    color: "FBCA04"
-  - name: area:scan
-    color: "C2E0C6"
-  - name: area:analysis
-    color: "BFDADC"
-  - name: area:reports
-    color: "D4C5F9"
-  - name: area:cli
-    color: "F9D0C4"
-  - name: area:ci
-    color: "E99695"
-  - name: priority:p0
-    color: "B60205"
-  - name: priority:p1
-    color: "FBCA04"
-  - name: priority:p2
-    color: "0E8A16"
-  - name: status:blocked
-    color: "000000"
-  - name: status:ready
-    color: "0052CC"
-  - name: good first issue
-    color: "7057FF"
-
+# Labels and milestones defined here have been applied to the repository.
+# They are managed directly on GitHub — no workflow needed.
+# To re-apply or update, use:
+#   gh label create <name> --color <hex> --repo ricardogr07/reposage --force
+#   gh api repos/ricardogr07/reposage/milestones --method POST -f title=<title> -f description=<desc>
