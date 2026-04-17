@@ -1,1 +1,0 @@
-"""Optional AI enrichment boundaries."""
