@@ -161,8 +161,10 @@ def _parse_requirements(path: Path, relative_path: str) -> list[Dependency]:
     dependencies: list[Dependency] = []
     for raw_line in lines:
         line = raw_line.strip()
-        if not line or line.startswith("#") or line.startswith(
-            ("-", "http://", "https://", "git+")
+        if (
+            not line
+            or line.startswith("#")
+            or line.startswith(("-", "http://", "https://", "git+"))
         ):
             continue
         dependency = _parse_dependency_string(
