@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 from reposage.enrichment.models import EnrichmentResult
+from reposage.models import AuditReport
 from reposage.pipeline import build_audit_report
 from reposage.reports.json_report import render_json_report
 from reposage.reports.markdown import render_markdown_report
@@ -94,14 +95,8 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 
 
-def _run_enrichment(report: object) -> EnrichmentResult | None:
+def _run_enrichment(report: AuditReport) -> EnrichmentResult | None:
     """Validate prerequisites and run enrichment; return None on failure."""
-    from reposage.models import AuditReport
-
-    if not isinstance(report, AuditReport):
-        print("error: enrichment requires an AuditReport", file=sys.stderr)
-        return None
-
     if not os.environ.get("ANTHROPIC_API_KEY"):
         print(
             "error: --enrich requires ANTHROPIC_API_KEY to be set",
