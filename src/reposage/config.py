@@ -34,6 +34,7 @@ class ScanConfig:
 
     ignored_directories: frozenset[str] = DEFAULT_IGNORED_DIRECTORIES
     max_hotspots: int = 5
+    dependency_count_risk_threshold: int = 25
 
 
 DEFAULT_SCAN_CONFIG = ScanConfig()

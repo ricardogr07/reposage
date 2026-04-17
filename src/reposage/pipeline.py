@@ -39,7 +39,7 @@ def build_audit_report(root: Path, config: ScanConfig | None = None) -> AuditRep
         manifest_paths=dependencies.manifests,
         max_hotspots=active_config.max_hotspots,
     )
-    risk = analyze_risk(quality, architecture, dependencies)
+    risk = analyze_risk(quality, architecture, dependencies, config=active_config)
 
     return AuditReport(
         inventory=inventory,

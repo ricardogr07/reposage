@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from reposage.config import ScanConfig
 from reposage.models import (
     ArchitectureSummary,
     DependencySummary,
@@ -16,9 +17,11 @@ def analyze_risk(
     quality: QualitySignals,
     architecture: ArchitectureSummary,
     dependencies: DependencySummary,
+    config: ScanConfig | None = None,
 ) -> RiskReport:
     """Build a concise risk report from quality and architecture signals."""
 
+    active_config = config or ScanConfig()
     items: list[RiskItem] = []
     refactor_candidates = list(architecture.god_modules[:3])
     weak_points = list(quality.missing_signals)
@@ -86,7 +89,7 @@ def analyze_risk(
         )
         roadmap_buckets.append("Improve onboarding")
 
-    if len(dependencies.dependencies) >= 25:
+    if len(dependencies.dependencies) >= active_config.dependency_count_risk_threshold:
         items.append(
             RiskItem(
                 title="Dependency surface area is growing",
