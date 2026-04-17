@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-def fixture_path(name: str) -> Path:
+
+def fixture_path(name: str):
     """Return the path to a named test fixture repository."""
 
     from pathlib import Path
