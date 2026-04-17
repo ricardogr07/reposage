@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
+from reposage.enrichment.models import EnrichmentResult
 from reposage.pipeline import build_audit_report
 from reposage.reports.json_report import render_json_report
 from reposage.reports.markdown import render_markdown_report
@@ -29,6 +31,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Output format.",
     )
     report_parser.add_argument("--output", help="Optional path for report output.")
+    report_parser.add_argument(
+        "--enrich",
+        action="store_true",
+        default=False,
+        help="Enrich the report with AI analysis (requires ANTHROPIC_API_KEY and reposage[ai]).",
+    )
 
     run_parser = subparsers.add_parser(
         "run",
@@ -36,6 +44,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
     run_parser.add_argument("path", help="Path to the repository to analyze.")
     run_parser.add_argument("--output", help="Optional path for Markdown output.")
+    run_parser.add_argument(
+        "--enrich",
+        action="store_true",
+        default=False,
+        help="Enrich the report with AI analysis (requires ANTHROPIC_API_KEY and reposage[ai]).",
+    )
 
     return parser
 
@@ -56,14 +70,20 @@ def main(argv: list[str] | None = None) -> int:
 
     report = build_audit_report(target_path)
 
+    enrichment = None
+    if getattr(args, "enrich", False):
+        enrichment = _run_enrichment(report)
+        if enrichment is None:
+            return 2
+
     if args.command == "report":
         output = (
-            render_markdown_report(report)
+            render_markdown_report(report, enrichment=enrichment)
             if args.format == "markdown"
-            else render_json_report(report)
+            else render_json_report(report, enrichment=enrichment)
         )
     else:
-        output = render_markdown_report(report)
+        output = render_markdown_report(report, enrichment=enrichment)
 
     output_path = getattr(args, "output", None)
     if output_path:
@@ -72,3 +92,35 @@ def main(argv: list[str] | None = None) -> int:
         print(output)
 
     return 0
+
+
+def _run_enrichment(report: object) -> EnrichmentResult | None:
+    """Validate prerequisites and run enrichment; return None on failure."""
+    from reposage.models import AuditReport
+
+    if not isinstance(report, AuditReport):
+        print("error: enrichment requires an AuditReport", file=sys.stderr)
+        return None
+
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        print(
+            "error: --enrich requires ANTHROPIC_API_KEY to be set",
+            file=sys.stderr,
+        )
+        return None
+
+    try:
+        import anthropic as _anthropic_check  # noqa: F401
+    except ImportError:
+        print(
+            "error: --enrich requires the 'anthropic' package. "
+            "Install it with: pip install 'reposage[ai]'",
+            file=sys.stderr,
+        )
+        return None
+
+    from reposage.enrichment.anthropic_provider import AnthropicEnricher
+    from reposage.enrichment.provider import enrich_report
+
+    enricher = AnthropicEnricher()
+    return enrich_report(report, enricher)

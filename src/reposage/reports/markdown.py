@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+from reposage.enrichment.models import EnrichmentResult
 from reposage.models import AuditReport, Dependency, LanguageStat
 
 
-def render_markdown_report(report: AuditReport) -> str:
+def render_markdown_report(report: AuditReport, enrichment: EnrichmentResult | None = None) -> str:
     """Render a deterministic Markdown report."""
 
     inventory = report.inventory
@@ -68,7 +69,50 @@ def render_markdown_report(report: AuditReport) -> str:
         ]
     )
 
+    if enrichment is not None:
+        lines.extend(_render_enrichment(enrichment))
+
     return "\n".join(lines).rstrip() + "\n"
+
+
+def _render_enrichment(enrichment: EnrichmentResult) -> list[str]:
+    out: list[str] = ["", "## Module Responsibilities", ""]
+
+    if enrichment.module_roles:
+        out.append("| Module | Layer | Responsibility |")
+        out.append("| --- | --- | --- |")
+        for role in enrichment.module_roles:
+            out.append(f"| `{role.module}` | {role.layer} | {role.responsibility} |")
+    else:
+        out.append("_(no module roles returned)_")
+
+    out += ["", "## Technical Debt", ""]
+    if enrichment.debt_items:
+        for item in enrichment.debt_items:
+            severity_label = f"[{item.severity.upper()}]"
+            out.append(f"### {severity_label} {item.title}")
+            out.append("")
+            out.append(item.description)
+            out.append("")
+            out.append(f"**GitHub issue title:** {item.issue_title}")
+            out.append("")
+            out.append("<details><summary>Issue body</summary>")
+            out.append("")
+            out.append(item.issue_body)
+            out.append("")
+            out.append("</details>")
+            out.append("")
+    else:
+        out.append("_(no debt items returned)_")
+
+    out += ["", "## Top 5 Improvements", ""]
+    for imp in enrichment.top_improvements:
+        effort_label = f"(effort: {imp.effort})"
+        out.append(f"{imp.rank}. **{imp.title}** {effort_label}")
+        out.append(f"   {imp.rationale}")
+        out.append("")
+
+    return out
 
 
 def _format_list(values: list[str]) -> str:
