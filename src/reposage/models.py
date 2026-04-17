@@ -57,11 +57,15 @@ class DependencySummary:
 
 @dataclass(slots=True)
 class RepoInventory:
-    """Top-level inventory extracted from the repository."""
+    """Top-level inventory extracted from the repository.
+
+    Note: only scanned_files is tracked; a reliable total-file count (including
+    ignored directories) would require re-walking those directories and is not
+    provided.
+    """
 
     project_name: str
     root_path: str
-    total_files: int
     scanned_files: int
     ignored_directories: list[str] = field(default_factory=list)
     top_level_entries: list[str] = field(default_factory=list)

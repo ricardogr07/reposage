@@ -44,7 +44,6 @@ def build_inventory(
     return RepoInventory(
         project_name=root.name,
         root_path=str(root),
-        total_files=len(file_records) + len(ignored_directories),
         scanned_files=len(file_records),
         ignored_directories=ignored_directories,
         top_level_entries=top_level_entries,
