@@ -39,6 +39,10 @@ dev = [
 ai = [
   "anthropic>=0.40",
 ]
+server = [
+  "mcp[cli]>=1.0",
+  "uvicorn>=0.30",
+]
 
 [project.scripts]
 reposage = "reposage.cli:main"
