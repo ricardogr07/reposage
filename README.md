@@ -91,7 +91,7 @@ same `tox` commands.
 
 ## Project documents
 
-- [PLAN.md](PLAN.md): roadmap, issue backlog, PR strategy, and acceptance criteria
+- [PLAN.md](docs/plans/m1-foundation.md): roadmap, issue backlog, PR strategy, and acceptance criteria
 - [CHANGELOG.md](CHANGELOG.md): version history
 - [docs/architecture.md](docs/architecture.md): package and data-flow overview
 - [docs/development.md](docs/development.md): contributor workflow and quality gates
