@@ -5,7 +5,7 @@ WORKDIR /build
 COPY pyproject.toml README.md ./
 COPY src/ src/
 
-RUN pip install --no-cache-dir --target /deps ".[server]"
+RUN pip install --no-cache-dir --target /deps ".[server,ai]"
 
 # Stage 2: minimal runtime image
 FROM python:3.12-slim

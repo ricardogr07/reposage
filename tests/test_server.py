@@ -15,6 +15,7 @@ from starlette.testclient import TestClient  # noqa: E402
 from reposage.server.app import (  # noqa: E402
     _audit,
     _clone,
+    _resolve_token,
     _validate_repo_url,
     create_mcp_app,
 )
@@ -109,3 +110,95 @@ def test_clone_uses_list_args_not_shell(tmp_path: Path) -> None:
     assert isinstance(first_call_args, list)
     assert "https://github.com/example/repo" in first_call_args
     assert dest in first_call_args
+
+
+# ---------------------------------------------------------------------------
+# Unit: URL validation — embedded credentials
+# ---------------------------------------------------------------------------
+
+
+def test_validate_url_rejects_embedded_token() -> None:
+    with pytest.raises(ValueError, match="Credentials must not be embedded"):
+        _validate_repo_url("https://mytoken@github.com/org/repo")
+
+
+def test_validate_url_rejects_user_and_password() -> None:
+    with pytest.raises(ValueError, match="Credentials must not be embedded"):
+        _validate_repo_url("https://user:pass@github.com/org/repo")
+
+
+# ---------------------------------------------------------------------------
+# Unit: _resolve_token precedence
+# ---------------------------------------------------------------------------
+
+
+def test_resolve_token_returns_param_when_given() -> None:
+    assert _resolve_token("p") == "p"
+
+
+def test_resolve_token_falls_back_to_env_var() -> None:
+    with patch.dict("os.environ", {"GITHUB_TOKEN": "e"}):
+        assert _resolve_token(None) == "e"
+
+
+def test_resolve_token_param_beats_env_var() -> None:
+    with patch.dict("os.environ", {"GITHUB_TOKEN": "e"}):
+        assert _resolve_token("p") == "p"
+
+
+def test_resolve_token_none_when_both_absent() -> None:
+    clean_env = {k: v for k, v in os.environ.items() if k != "GITHUB_TOKEN"}
+    with patch.dict("os.environ", clean_env, clear=True):
+        assert _resolve_token(None) is None
+
+
+# ---------------------------------------------------------------------------
+# Unit: _clone token handling (mocked subprocess)
+# ---------------------------------------------------------------------------
+
+
+def test_clone_token_passed_as_auth_header_not_in_url(tmp_path: Path) -> None:
+    import base64
+
+    dest = str(tmp_path / "repo")
+    with patch("reposage.server.app.subprocess.run") as mock_run:
+        mock_run.return_value = None
+        _clone("https://github.com/example/private", "main", dest, token="ghp_test123")
+
+    first_call_args = mock_run.call_args_list[0][0][0]
+    assert isinstance(first_call_args, list)
+    assert "-c" in first_call_args
+    expected_b64 = base64.b64encode(b"x-access-token:ghp_test123").decode()
+    assert any(expected_b64 in v for v in first_call_args if isinstance(v, str))
+    # Token must not appear in the URL position
+    url_idx = first_call_args.index("https://github.com/example/private")
+    assert "ghp_test123" not in first_call_args[url_idx]
+
+
+def test_clone_without_token_excludes_auth_header(tmp_path: Path) -> None:
+    dest = str(tmp_path / "repo")
+    with patch("reposage.server.app.subprocess.run") as mock_run:
+        mock_run.return_value = None
+        _clone("https://github.com/example/repo", "main", dest)
+
+    first_call_args = mock_run.call_args_list[0][0][0]
+    assert "-c" not in first_call_args
+    assert not any("http.extraheader" in v for v in first_call_args if isinstance(v, str))
+
+
+def test_clone_param_token_beats_env_var(tmp_path: Path) -> None:
+    import base64
+
+    dest = str(tmp_path / "repo")
+    with (
+        patch("reposage.server.app.subprocess.run") as mock_run,
+        patch.dict("os.environ", {"GITHUB_TOKEN": "env_token"}),
+    ):
+        mock_run.return_value = None
+        _clone("https://github.com/example/private", "main", dest, token="param_token")
+
+    first_call_args = mock_run.call_args_list[0][0][0]
+    param_b64 = base64.b64encode(b"x-access-token:param_token").decode()
+    env_b64 = base64.b64encode(b"x-access-token:env_token").decode()
+    assert any(param_b64 in v for v in first_call_args if isinstance(v, str))
+    assert not any(env_b64 in v for v in first_call_args if isinstance(v, str))
