@@ -10,25 +10,25 @@
       "automation configuration is isolated from product code"
     ],
     "god_modules": [
-      ".claude/worktrees/jolly-wozniak/PLAN_FIX.md (498 lines)",
-      "M2_PLAN.md (482 lines)",
-      ".claude/worktrees/jolly-wozniak/AGENTS.md (435 lines)",
-      "AGENTS.md (435 lines)",
-      "tests/test_enrichment.py (406 lines)"
+      "examples/reposage-audit.json (668 lines)",
+      "docs/plans/m2-ai-enrichment.md (482 lines)",
+      "docs/agents.md (435 lines)",
+      "src/reposage/scan/dependencies.py (293 lines)",
+      "tests/test_dependencies.py (216 lines)"
     ],
     "hotspots": [
-      ".claude/worktrees/jolly-wozniak/PLAN_FIX.md (21778 bytes, 498 lines)",
-      "M2_PLAN.md (18776 bytes, 482 lines)",
-      ".claude/worktrees/jolly-wozniak/AGENTS.md (15391 bytes, 435 lines)",
-      "AGENTS.md (15391 bytes, 435 lines)",
-      "tests/test_enrichment.py (14069 bytes, 406 lines)"
+      "examples/reposage-audit.json (22352 bytes, 668 lines)",
+      "docs/plans/m2-ai-enrichment.md (18776 bytes, 482 lines)",
+      "docs/agents.md (15391 bytes, 435 lines)",
+      "src/reposage/scan/dependencies.py (8675 bytes, 293 lines)",
+      "tests/test_dependencies.py (6889 bytes, 216 lines)"
     ],
     "main_modules": [
-      ".claude",
       "tests",
       "src/reposage",
-      ".tmp",
-      ".github"
+      ".github",
+      "terraform",
+      "docs"
     ],
     "probable_layers": [
       "application source",
@@ -40,8 +40,8 @@
   },
   "dependencies": {
     "counts_by_ecosystem": {
-      "npm": 12,
-      "python": 39
+      "npm": 6,
+      "python": 19
     },
     "dependencies": [
       {
@@ -55,13 +55,6 @@
         "ecosystem": "python",
         "group": "dev",
         "name": "build",
-        "source_file": ".claude/worktrees/jolly-wozniak/pyproject.toml",
-        "version_spec": ">=1.2"
-      },
-      {
-        "ecosystem": "python",
-        "group": "dev",
-        "name": "build",
         "source_file": "pyproject.toml",
         "version_spec": ">=1.2"
       },
@@ -69,29 +62,8 @@
         "ecosystem": "npm",
         "group": "dependencies",
         "name": "express",
-        "source_file": ".claude/worktrees/jolly-wozniak/tests/fixtures/monorepo_repo/packages/api/package.json",
-        "version_spec": "^5.0.0"
-      },
-      {
-        "ecosystem": "npm",
-        "group": "dependencies",
-        "name": "express",
         "source_file": "tests/fixtures/monorepo_repo/packages/api/package.json",
         "version_spec": "^5.0.0"
-      },
-      {
-        "ecosystem": "python",
-        "group": "runtime",
-        "name": "fastapi",
-        "source_file": ".claude/worktrees/jolly-wozniak/tests/fixtures/mixed_repo/pyproject.toml",
-        "version_spec": ">=0.115"
-      },
-      {
-        "ecosystem": "python",
-        "group": "runtime",
-        "name": "fastapi",
-        "source_file": ".claude/worktrees/jolly-wozniak/tests/fixtures/python_repo/pyproject.toml",
-        "version_spec": ">=0.115"
       },
       {
         "ecosystem": "python",
@@ -109,27 +81,6 @@
       },
       {
         "ecosystem": "python",
-        "group": "requirements",
-        "name": "flask",
-        "source_file": ".tmp/pytest-of-unknown/pytest-0/test_dependency_surface_risk_u0/requirements.txt",
-        "version_spec": ">=3.0"
-      },
-      {
-        "ecosystem": "python",
-        "group": "requirements",
-        "name": "flask",
-        "source_file": ".tmp/pytest-of-unknown/pytest-0/test_parse_requirements_skips_0/requirements.txt",
-        "version_spec": ">=3.0"
-      },
-      {
-        "ecosystem": "python",
-        "group": "dev",
-        "name": "hatchling",
-        "source_file": ".claude/worktrees/jolly-wozniak/pyproject.toml",
-        "version_spec": ">=1.26"
-      },
-      {
-        "ecosystem": "python",
         "group": "dev",
         "name": "hatchling",
         "source_file": "pyproject.toml",
@@ -137,17 +88,10 @@
       },
       {
         "ecosystem": "python",
-        "group": "docs",
-        "name": "mkdocs",
-        "source_file": ".tmp/pytest-of-unknown/pytest-0/test_parse_pyproject_collects_0/pyproject.toml",
-        "version_spec": "*"
-      },
-      {
-        "ecosystem": "python",
-        "group": "dev",
-        "name": "mypy",
-        "source_file": ".claude/worktrees/jolly-wozniak/pyproject.toml",
-        "version_spec": ">=1.11"
+        "group": "server",
+        "name": "mcp",
+        "source_file": "pyproject.toml",
+        "version_spec": "[cli]>=1.0"
       },
       {
         "ecosystem": "python",
@@ -155,13 +99,6 @@
         "name": "mypy",
         "source_file": "pyproject.toml",
         "version_spec": ">=1.11"
-      },
-      {
-        "ecosystem": "python",
-        "group": "dev",
-        "name": "mypy",
-        "source_file": ".claude/worktrees/jolly-wozniak/tests/fixtures/mixed_repo/pyproject.toml",
-        "version_spec": ">=1.14"
       },
       {
         "ecosystem": "python",
@@ -169,20 +106,6 @@
         "name": "mypy",
         "source_file": "tests/fixtures/mixed_repo/pyproject.toml",
         "version_spec": ">=1.14"
-      },
-      {
-        "ecosystem": "python",
-        "group": "lint",
-        "name": "mypy",
-        "source_file": ".tmp/pytest-of-unknown/pytest-0/test_parse_pyproject_collects_0/pyproject.toml",
-        "version_spec": "^1.10"
-      },
-      {
-        "ecosystem": "npm",
-        "group": "dependencies",
-        "name": "next",
-        "source_file": ".claude/worktrees/jolly-wozniak/tests/fixtures/js_repo/package.json",
-        "version_spec": "^15.0.0"
       },
       {
         "ecosystem": "npm",
@@ -193,17 +116,10 @@
       },
       {
         "ecosystem": "python",
-        "group": "runtime",
-        "name": "pydantic",
-        "source_file": ".claude/worktrees/jolly-wozniak/tests/fixtures/mixed_repo/pyproject.toml",
-        "version_spec": ">=2.10"
-      },
-      {
-        "ecosystem": "python",
-        "group": "runtime",
-        "name": "pydantic",
-        "source_file": ".claude/worktrees/jolly-wozniak/tests/fixtures/monorepo_repo/packages/lib/pyproject.toml",
-        "version_spec": ">=2.10"
+        "group": "ai",
+        "name": "openai",
+        "source_file": "pyproject.toml",
+        "version_spec": ">=1.0"
       },
       {
         "ecosystem": "python",
@@ -223,32 +139,11 @@
         "ecosystem": "python",
         "group": "dev",
         "name": "pytest",
-        "source_file": ".claude/worktrees/jolly-wozniak/tests/fixtures/python_repo/pyproject.toml",
-        "version_spec": ">=8.0"
-      },
-      {
-        "ecosystem": "python",
-        "group": "dev",
-        "name": "pytest",
-        "source_file": ".tmp/pytest-of-unknown/pytest-0/test_parse_pyproject_collects_0/pyproject.toml",
-        "version_spec": ">=8.0"
-      },
-      {
-        "ecosystem": "python",
-        "group": "dev",
-        "name": "pytest",
         "source_file": "tests/fixtures/python_repo/pyproject.toml",
         "version_spec": ">=8.0"
       },
       {
         "ecosystem": "python",
-        "group": "dev",
-        "name": "pytest",
-        "source_file": ".claude/worktrees/jolly-wozniak/pyproject.toml",
-        "version_spec": ">=8.3"
-      },
-      {
-        "ecosystem": "python",
         "group": "ai",
         "name": "pytest",
         "source_file": "pyproject.toml",
@@ -263,13 +158,6 @@
       },
       {
         "ecosystem": "python",
-        "group": "dev",
-        "name": "pytest-cov",
-        "source_file": ".claude/worktrees/jolly-wozniak/pyproject.toml",
-        "version_spec": ">=6.0"
-      },
-      {
-        "ecosystem": "python",
         "group": "ai",
         "name": "pytest-cov",
         "source_file": "pyproject.toml",
@@ -281,20 +169,6 @@
         "name": "pytest-cov",
         "source_file": "pyproject.toml",
         "version_spec": ">=6.0"
-      },
-      {
-        "ecosystem": "npm",
-        "group": "dependencies",
-        "name": "react",
-        "source_file": ".claude/worktrees/jolly-wozniak/tests/fixtures/js_repo/package.json",
-        "version_spec": "^19.0.0"
-      },
-      {
-        "ecosystem": "npm",
-        "group": "dependencies",
-        "name": "react",
-        "source_file": ".claude/worktrees/jolly-wozniak/tests/fixtures/mixed_repo/package.json",
-        "version_spec": "^19.0.0"
       },
       {
         "ecosystem": "npm",
@@ -312,34 +186,6 @@
       },
       {
         "ecosystem": "python",
-        "group": "requirements",
-        "name": "requests",
-        "source_file": ".tmp/pytest-of-unknown/pytest-0/test_parse_requirements_skips_0/requirements.txt",
-        "version_spec": "==2.31.0"
-      },
-      {
-        "ecosystem": "python",
-        "group": "requirements",
-        "name": "requests",
-        "source_file": ".tmp/pytest-of-unknown/pytest-0/test_dependency_surface_risk_u0/requirements.txt",
-        "version_spec": ">=2.0"
-      },
-      {
-        "ecosystem": "python",
-        "group": "runtime",
-        "name": "requests",
-        "source_file": ".tmp/pytest-of-unknown/pytest-0/test_parse_pyproject_collects_0/pyproject.toml",
-        "version_spec": ">=2.0"
-      },
-      {
-        "ecosystem": "python",
-        "group": "dev",
-        "name": "ruff",
-        "source_file": ".claude/worktrees/jolly-wozniak/pyproject.toml",
-        "version_spec": ">=0.11"
-      },
-      {
-        "ecosystem": "python",
         "group": "dev",
         "name": "ruff",
         "source_file": "pyproject.toml",
@@ -347,31 +193,10 @@
       },
       {
         "ecosystem": "python",
-        "group": "lint",
-        "name": "ruff",
-        "source_file": ".tmp/pytest-of-unknown/pytest-0/test_parse_pyproject_collects_0/pyproject.toml",
-        "version_spec": "^0.5"
-      },
-      {
-        "ecosystem": "python",
-        "group": "dev",
-        "name": "tox",
-        "source_file": ".claude/worktrees/jolly-wozniak/pyproject.toml",
-        "version_spec": ">=4.27"
-      },
-      {
-        "ecosystem": "python",
         "group": "dev",
         "name": "tox",
         "source_file": "pyproject.toml",
         "version_spec": ">=4.27"
-      },
-      {
-        "ecosystem": "npm",
-        "group": "devDependencies",
-        "name": "typescript",
-        "source_file": ".claude/worktrees/jolly-wozniak/tests/fixtures/js_repo/package.json",
-        "version_spec": "^5.8.0"
       },
       {
         "ecosystem": "npm",
@@ -382,17 +207,10 @@
       },
       {
         "ecosystem": "python",
-        "group": "requirements",
-        "name": "urllib3",
-        "source_file": ".tmp/pytest-of-unknown/pytest-0/test_summarize_dependencies_di0/requirements-dev.txt",
-        "version_spec": ">=2.0"
-      },
-      {
-        "ecosystem": "npm",
-        "group": "devDependencies",
-        "name": "vitest",
-        "source_file": ".claude/worktrees/jolly-wozniak/tests/fixtures/mixed_repo/package.json",
-        "version_spec": "^2.1.0"
+        "group": "server",
+        "name": "uvicorn",
+        "source_file": "pyproject.toml",
+        "version_spec": ">=0.30"
       },
       {
         "ecosystem": "npm",
@@ -407,19 +225,6 @@
       "python"
     ],
     "manifests": [
-      ".claude/worktrees/jolly-wozniak/pyproject.toml",
-      ".claude/worktrees/jolly-wozniak/tests/fixtures/js_repo/package.json",
-      ".claude/worktrees/jolly-wozniak/tests/fixtures/mixed_repo/package.json",
-      ".claude/worktrees/jolly-wozniak/tests/fixtures/mixed_repo/pyproject.toml",
-      ".claude/worktrees/jolly-wozniak/tests/fixtures/monorepo_repo/packages/api/package.json",
-      ".claude/worktrees/jolly-wozniak/tests/fixtures/monorepo_repo/packages/lib/pyproject.toml",
-      ".claude/worktrees/jolly-wozniak/tests/fixtures/python_repo/pyproject.toml",
-      ".tmp/pytest-of-unknown/pytest-0/test_dependency_surface_risk_u0/requirements.txt",
-      ".tmp/pytest-of-unknown/pytest-0/test_parse_package_json_return0/package.json",
-      ".tmp/pytest-of-unknown/pytest-0/test_parse_pyproject_collects_0/pyproject.toml",
-      ".tmp/pytest-of-unknown/pytest-0/test_parse_pyproject_returns_e0/pyproject.toml",
-      ".tmp/pytest-of-unknown/pytest-0/test_parse_requirements_skips_0/requirements.txt",
-      ".tmp/pytest-of-unknown/pytest-0/test_summarize_dependencies_di0/requirements-dev.txt",
       "pyproject.toml",
       "tests/fixtures/js_repo/package.json",
       "tests/fixtures/mixed_repo/package.json",
@@ -433,24 +238,17 @@
     "frameworks": [
       "Express",
       "FastAPI",
-      "Flask",
       "Next.js",
       "React"
     ],
     "ignored_directories": [
-      ".claude/worktrees/jolly-wozniak/tests/__pycache__",
       ".git",
-      ".mypy_cache",
-      ".ruff_cache",
-      ".tmp/pytest-of-unknown/pytest-0/test_scan_repository_ignores_c0/node_modules",
-      ".tox",
-      "dist",
       "src/reposage/__pycache__",
       "src/reposage/analysis/__pycache__",
       "src/reposage/enrichment/__pycache__",
       "src/reposage/reports/__pycache__",
       "src/reposage/scan/__pycache__",
-      "tests/__pycache__",
+      "src/reposage/server/__pycache__",
       "tests/fixtures/mixed_repo/.ruff_cache",
       "tests/fixtures/mixed_repo/tests/__pycache__",
       "tests/fixtures/python_repo/.ruff_cache",
@@ -458,99 +256,95 @@
     ],
     "languages": [
       {
-        "file_count": 75,
+        "file_count": 52,
         "language": "Python",
-        "total_bytes": 147736
+        "total_bytes": 112343
       },
       {
-        "file_count": 38,
+        "file_count": 20,
         "language": "Markdown",
-        "total_bytes": 109847
+        "total_bytes": 85765
       },
       {
-        "file_count": 10,
-        "language": "TOML",
-        "total_bytes": 6269
-      },
-      {
-        "file_count": 10,
+        "file_count": 6,
         "language": "JSON",
-        "total_bytes": 3219
+        "total_bytes": 24821
       },
       {
-        "file_count": 11,
+        "file_count": 13,
         "language": "YAML",
-        "total_bytes": 3083
+        "total_bytes": 9953
       },
       {
         "file_count": 4,
-        "language": "Text",
-        "total_bytes": 244
+        "language": "TOML",
+        "total_bytes": 3349
       },
       {
-        "file_count": 4,
-        "language": "React TSX",
-        "total_bytes": 206
+        "file_count": 1,
+        "language": "Docker",
+        "total_bytes": 891
       },
       {
         "file_count": 2,
-        "language": "JavaScript",
-        "total_bytes": 40
+        "language": "React TSX",
+        "total_bytes": 100
       }
     ],
     "largest_files": [
       {
-        "extension": null,
-        "line_count": 71,
-        "path": ".coverage",
-        "size_bytes": 53248
-      },
-      {
-        "extension": null,
-        "line_count": 68,
-        "path": ".claude/worktrees/jolly-wozniak/.coverage",
-        "size_bytes": 53248
+        "extension": ".json",
+        "line_count": 668,
+        "path": "examples/reposage-audit.json",
+        "size_bytes": 22352
       },
       {
         "extension": ".md",
-        "line_count": 498,
-        "path": ".claude/worktrees/jolly-wozniak/PLAN_FIX.md",
-        "size_bytes": 21778
+        "line_count": 209,
+        "path": "examples/reposage-audit-enriched.md",
+        "size_bytes": 20013
       },
       {
         "extension": ".md",
         "line_count": 482,
-        "path": "M2_PLAN.md",
+        "path": "docs/plans/m2-ai-enrichment.md",
         "size_bytes": 18776
       },
       {
         "extension": ".md",
         "line_count": 435,
-        "path": ".claude/worktrees/jolly-wozniak/AGENTS.md",
+        "path": "docs/agents.md",
         "size_bytes": 15391
+      },
+      {
+        "extension": ".md",
+        "line_count": 193,
+        "path": "docs/architecture.md",
+        "size_bytes": 8690
       }
     ],
     "project_name": "reposage",
     "root_path": "C:\\git\\reposage",
-    "scanned_files": 167,
+    "scanned_files": 111,
     "top_level_entries": [
       ".claude",
-      ".coverage",
       ".env",
       ".github",
       ".gitignore",
-      ".tmp",
-      "AGENTS.md",
+      ".pre-commit-config.yaml",
       "CHANGELOG.md",
       "CONTRIBUTING.md",
+      "Dockerfile",
       "LICENSE",
-      "M2_PLAN.md",
-      "PLAN.md",
       "README.md",
+      "action.yml",
       "docs",
       "examples",
+      "k8s",
       "pyproject.toml",
+      "scripts",
       "src/reposage",
+      "terraform",
       "tests",
       "tox.ini"
     ]
@@ -566,19 +360,18 @@
     ],
     "ci_files": [
       ".github/workflows/ci.yml",
+      ".github/workflows/demo.yml",
+      ".github/workflows/deploy.yml",
       ".github/workflows/release.yml"
     ],
     "ci_present": true,
     "documentation_files": [
-      ".claude/worktrees/jolly-wozniak/README.md",
-      ".claude/worktrees/jolly-wozniak/examples/README.md",
-      ".claude/worktrees/jolly-wozniak/tests/fixtures/js_repo/README.md",
-      ".claude/worktrees/jolly-wozniak/tests/fixtures/mixed_repo/README.md",
-      ".claude/worktrees/jolly-wozniak/tests/fixtures/monorepo_repo/README.md",
-      ".claude/worktrees/jolly-wozniak/tests/fixtures/python_repo/README.md",
       "README.md",
+      "docs/agents.md",
       "docs/architecture.md",
       "docs/development.md",
+      "docs/plans/m1-foundation.md",
+      "docs/plans/m2-ai-enrichment.md",
       "examples/README.md",
       "tests/fixtures/js_repo/README.md",
       "tests/fixtures/mixed_repo/README.md",
@@ -588,24 +381,11 @@
     "documentation_present": true,
     "has_tests": true,
     "lint_files": [
-      ".tmp/pytest-of-unknown/pytest-0/test_eslint_v9_flat_config_fil0/eslint.config.js",
-      ".tmp/pytest-of-unknown/pytest-0/test_eslint_v9_flat_config_fil1/eslint.config.mjs",
-      ".tmp/pytest-of-unknown/pytest-0/test_eslint_v9_flat_config_fil2/eslint.config.cjs",
       "pyproject.toml"
     ],
     "lint_present": true,
     "missing_signals": [],
     "packaging_files": [
-      ".claude/worktrees/jolly-wozniak/pyproject.toml",
-      ".claude/worktrees/jolly-wozniak/tests/fixtures/js_repo/package.json",
-      ".claude/worktrees/jolly-wozniak/tests/fixtures/mixed_repo/package.json",
-      ".claude/worktrees/jolly-wozniak/tests/fixtures/mixed_repo/pyproject.toml",
-      ".claude/worktrees/jolly-wozniak/tests/fixtures/monorepo_repo/packages/api/package.json",
-      ".claude/worktrees/jolly-wozniak/tests/fixtures/monorepo_repo/packages/lib/pyproject.toml",
-      ".claude/worktrees/jolly-wozniak/tests/fixtures/python_repo/pyproject.toml",
-      ".tmp/pytest-of-unknown/pytest-0/test_parse_package_json_return0/package.json",
-      ".tmp/pytest-of-unknown/pytest-0/test_parse_pyproject_collects_0/pyproject.toml",
-      ".tmp/pytest-of-unknown/pytest-0/test_parse_pyproject_returns_e0/pyproject.toml",
       "pyproject.toml",
       "tests/fixtures/js_repo/package.json",
       "tests/fixtures/mixed_repo/package.json",
@@ -617,19 +397,18 @@
     "packaging_present": true,
     "score": 100,
     "test_files": [
-      ".claude/worktrees/jolly-wozniak/tests/__init__.py",
-      ".claude/worktrees/jolly-wozniak/tests/conftest.py",
-      ".claude/worktrees/jolly-wozniak/tests/fixtures/js_repo/src/index.tsx",
-      ".claude/worktrees/jolly-wozniak/tests/fixtures/missing_signals_repo/src/legacy.py",
-      ".claude/worktrees/jolly-wozniak/tests/fixtures/mixed_repo/src/app/main.py",
-      ".claude/worktrees/jolly-wozniak/tests/fixtures/mixed_repo/tests/test_main.py",
-      ".claude/worktrees/jolly-wozniak/tests/fixtures/mixed_repo/web/src/index.tsx",
-      ".claude/worktrees/jolly-wozniak/tests/fixtures/monorepo_repo/packages/lib/src/lib_pkg/__init__.py",
-      ".claude/worktrees/jolly-wozniak/tests/fixtures/python_repo/src/example_pkg/__init__.py",
-      ".claude/worktrees/jolly-wozniak/tests/fixtures/python_repo/src/example_pkg/service.py"
+      "tests/__init__.py",
+      "tests/conftest.py",
+      "tests/fixtures/js_repo/src/index.tsx",
+      "tests/fixtures/missing_signals_repo/src/legacy.py",
+      "tests/fixtures/mixed_repo/src/app/main.py",
+      "tests/fixtures/mixed_repo/tests/test_main.py",
+      "tests/fixtures/mixed_repo/web/src/index.tsx",
+      "tests/fixtures/monorepo_repo/packages/lib/src/lib_pkg/__init__.py",
+      "tests/fixtures/python_repo/src/example_pkg/__init__.py",
+      "tests/fixtures/python_repo/src/example_pkg/service.py"
     ],
     "typing_files": [
-      ".claude/worktrees/jolly-wozniak/src/reposage/py.typed",
       "pyproject.toml",
       "src/reposage/py.typed"
     ],
@@ -655,9 +434,9 @@
       }
     ],
     "refactor_candidates": [
-      ".claude/worktrees/jolly-wozniak/PLAN_FIX.md (498 lines)",
-      "M2_PLAN.md (482 lines)",
-      ".claude/worktrees/jolly-wozniak/AGENTS.md (435 lines)"
+      "examples/reposage-audit.json (668 lines)",
+      "docs/plans/m2-ai-enrichment.md (482 lines)",
+      "docs/agents.md (435 lines)"
     ],
     "roadmap_buckets": [
       "Clarify architecture",

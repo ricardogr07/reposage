@@ -41,6 +41,7 @@ ai = [
   "openai>=1.0",
 ]
 server = [
+  "httpx>=0.27",
   "mcp[cli]>=1.0",
   "uvicorn>=0.30",
 ]
@@ -82,7 +83,6 @@ include = [
   "/docs",
   "/examples",
   "/README.md",
-  "/PLAN.md",
   "/CHANGELOG.md",
   "/LICENSE",
   "/tox.ini",

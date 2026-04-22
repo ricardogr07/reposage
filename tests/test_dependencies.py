@@ -6,15 +6,15 @@ from pathlib import Path
 
 from reposage.models import FileRecord
 from reposage.pipeline import build_audit_report
-from reposage.scan.dependencies import (
+from reposage.scan._dep_parsers import (
     _dependencies_from_mapping,
     _dependencies_from_strings,
     _parse_dependency_string,
     _parse_package_json,
     _parse_pyproject,
     _parse_requirements,
-    summarize_dependencies,
 )
+from reposage.scan.dependencies import summarize_dependencies
 from tests.conftest import fixture_path
 
 
