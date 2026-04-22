@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        toxenv: [lint, type, py312, pkg]
+        toxenv: [lint, type, py312, pkg, linecount]
     name: ${{ matrix.toxenv }}
     steps:
       - name: Check out repository

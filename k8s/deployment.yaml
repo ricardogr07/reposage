@@ -33,6 +33,20 @@ spec:
                   name: reposage-secrets
                   key: anthropic-api-key
                   optional: true
+            # Optional: remove if private repository access is not needed
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: reposage-secrets
+                  key: github-token
+                  optional: true
+            # Optional: remove if OpenAI enrichment is not used
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: reposage-secrets
+                  key: openai-api-key
+                  optional: true
           resources:
             requests:
               cpu: "250m"

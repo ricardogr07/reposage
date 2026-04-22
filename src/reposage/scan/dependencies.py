@@ -11,6 +11,10 @@ from reposage.models import Dependency, DependencySummary, FileRecord
 
 PACKAGE_NAME_PATTERN = re.compile(r"^\s*([A-Za-z0-9_.-]+)\s*(.*)$")
 
+_PYPROJECT = "pyproject.toml"
+_PACKAGE_JSON = "package.json"
+_REQUIREMENTS_PREFIX = "requirements"
+
 
 def summarize_dependencies(root: Path, file_records: list[FileRecord]) -> DependencySummary:
     """Parse supported manifests and summarize declared dependencies."""
@@ -29,9 +33,9 @@ def summarize_dependencies(root: Path, file_records: list[FileRecord]) -> Depend
     for manifest_path in manifest_paths:
         absolute_path = root / manifest_path
         file_name = PurePosixPath(manifest_path).name
-        if file_name == "pyproject.toml":
+        if file_name == _PYPROJECT:
             parsed_dependencies = _parse_pyproject(absolute_path, manifest_path)
-        elif file_name == "package.json":
+        elif file_name == _PACKAGE_JSON:
             parsed_dependencies = _parse_package_json(absolute_path, manifest_path)
         else:
             parsed_dependencies = _parse_requirements(absolute_path, manifest_path)
@@ -78,11 +82,7 @@ def summarize_dependencies(root: Path, file_records: list[FileRecord]) -> Depend
 
 
 def _is_supported_manifest(file_name: str) -> bool:
-    return (
-        file_name == "pyproject.toml"
-        or file_name == "package.json"
-        or file_name.startswith("requirements")
-    )
+    return file_name in (_PYPROJECT, _PACKAGE_JSON) or file_name.startswith(_REQUIREMENTS_PREFIX)
 
 
 def _parse_pyproject(path: Path, relative_path: str) -> list[Dependency]:

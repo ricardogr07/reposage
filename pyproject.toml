@@ -38,6 +38,7 @@ dev = [
 ]
 ai = [
   "anthropic>=0.40",
+  "openai>=1.0",
 ]
 server = [
   "mcp[cli]>=1.0",
@@ -66,6 +67,7 @@ dev = [
 ]
 ai = [
   "anthropic>=0.40",
+  "openai>=1.0",
   "pytest>=8.3",
   "pytest-cov>=6.0",
 ]
