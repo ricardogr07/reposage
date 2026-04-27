@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from reposage.enrichment.models import EnrichmentResult
-from reposage.models import AuditReport, Dependency, LanguageStat
+from reposage.models import AuditReport, Dependency, LanguageStat, SecuritySummary
 
 
 def render_markdown_report(report: AuditReport, enrichment: EnrichmentResult | None = None) -> str:
@@ -69,10 +69,47 @@ def render_markdown_report(report: AuditReport, enrichment: EnrichmentResult | N
         ]
     )
 
+    if report.security is not None:
+        lines.extend(["", *_render_security(report.security).splitlines()])
+
     if enrichment is not None:
         lines.extend(_render_enrichment(enrichment))
 
     return "\n".join(lines).rstrip() + "\n"
+
+
+def _render_security(security: SecuritySummary) -> str:
+    lines = ["## Security & Quality", ""]
+
+    if security.coverage_percent is not None:
+        lines.append(f"**Coverage:** {security.coverage_percent:.1f}% ({security.coverage_source})")
+        lines.append("")
+
+    if security.vulnerabilities:
+        lines += ["### Vulnerabilities", ""]
+        lines.append("| Package | Ecosystem | Severity | CVE | Fix |")
+        lines.append("|---|---|---|---|---|")
+        for v in security.vulnerabilities:
+            fix = v.fix_version or "none"
+            lines.append(f"| {v.package} | {v.ecosystem} | {v.severity} | {v.cve} | {fix} |")
+        lines.append("")
+
+    if security.lint_summaries:
+        lines += ["### Lint Findings", ""]
+        lines.append("| Tool | Errors | Warnings | Top Categories |")
+        lines.append("|---|---|---|---|")
+        for ls in security.lint_summaries:
+            cats = ", ".join(ls.top_categories) or "—"
+            lines.append(f"| {ls.tool} | {ls.error_count} | {ls.warning_count} | {cats} |")
+        lines.append("")
+
+    if security.tools_skipped:
+        lines += ["### Skipped Tools", ""]
+        for name, reason in security.tools_skipped:
+            lines.append(f"- `{name}`: {reason}")
+        lines.append("")
+
+    return "\n".join(lines)
 
 
 def _render_enrichment(enrichment: EnrichmentResult) -> list[str]:

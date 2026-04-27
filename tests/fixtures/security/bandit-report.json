@@ -1,0 +1,39 @@
+{
+  "errors": [],
+  "generated_at": "2024-01-15T10:00:00Z",
+  "metrics": {
+    "_totals": {
+      "CONFIDENCE.HIGH": 2,
+      "CONFIDENCE.MEDIUM": 1,
+      "SEVERITY.HIGH": 1,
+      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.LOW": 1
+    }
+  },
+  "results": [
+    {
+      "issue_confidence": "HIGH",
+      "issue_severity": "HIGH",
+      "issue_text": "Use of exec detected.",
+      "issue_type": "B102",
+      "line_number": 42,
+      "filename": "src/app.py"
+    },
+    {
+      "issue_confidence": "MEDIUM",
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible hardcoded password",
+      "issue_type": "B105",
+      "line_number": 17,
+      "filename": "src/config.py"
+    },
+    {
+      "issue_confidence": "HIGH",
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications of assert",
+      "issue_type": "B101",
+      "line_number": 8,
+      "filename": "tests/test_app.py"
+    }
+  ]
+}

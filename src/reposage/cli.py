@@ -38,6 +38,18 @@ def build_parser() -> argparse.ArgumentParser:
         default=False,
         help="Enrich the report with AI analysis (requires ANTHROPIC_API_KEY and reposage[ai]).",
     )
+    report_parser.add_argument(
+        "--agent-file",
+        metavar="PATH",
+        default=None,
+        help="Write an agent-actionable brief to PATH (e.g. AGENTS.md, CLAUDE.md).",
+    )
+    report_parser.add_argument(
+        "--security",
+        action="store_true",
+        default=False,
+        help="Run security and quality tool integrations (pip-audit, bandit, ruff, npm audit, eslint).",  # noqa: E501
+    )
 
     run_parser = subparsers.add_parser(
         "run",
@@ -50,6 +62,18 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         default=False,
         help="Enrich the report with AI analysis (requires ANTHROPIC_API_KEY and reposage[ai]).",
+    )
+    run_parser.add_argument(
+        "--agent-file",
+        metavar="PATH",
+        default=None,
+        help="Write an agent-actionable brief to PATH (e.g. AGENTS.md, CLAUDE.md).",
+    )
+    run_parser.add_argument(
+        "--security",
+        action="store_true",
+        default=False,
+        help="Run security and quality tool integrations (pip-audit, bandit, ruff, npm audit, eslint).",  # noqa: E501
     )
 
     return parser
@@ -71,6 +95,11 @@ def main(argv: list[str] | None = None) -> int:
 
     report = build_audit_report(target_path)
 
+    if getattr(args, "security", False):
+        from reposage.security.scan import scan_security
+
+        report.security = scan_security(target_path, report)
+
     enrichment = None
     if getattr(args, "enrich", False):
         enrichment = _run_enrichment(report)
@@ -91,6 +120,12 @@ def main(argv: list[str] | None = None) -> int:
         Path(output_path).write_text(output, encoding="utf-8")
     else:
         print(output)
+
+    agent_file = getattr(args, "agent_file", None)
+    if agent_file is not None:
+        from reposage.reports.agent_brief import render_agent_brief
+
+        Path(agent_file).write_text(render_agent_brief(report, enrichment), encoding="utf-8")
 
     return 0
 

@@ -129,6 +129,40 @@ class RiskReport:
 
 
 @dataclass(slots=True)
+class VulnerabilityFinding:
+    """A security vulnerability found in a dependency."""
+
+    package: str
+    ecosystem: str  # "python" | "npm"
+    severity: str  # "critical" | "high" | "medium" | "low"
+    cve: str  # CVE ID, advisory ID, or "" if not applicable
+    affected_version: str
+    fix_version: str  # "" if no fix available
+
+
+@dataclass(slots=True)
+class LintSummary:
+    """Aggregated lint findings from one tool."""
+
+    tool: str  # "ruff" | "eslint" | "bandit"
+    error_count: int
+    warning_count: int
+    top_categories: list[str]
+
+
+@dataclass(slots=True)
+class SecuritySummary:
+    """Security and quality findings from external tool integrations."""
+
+    vulnerabilities: list[VulnerabilityFinding] = field(default_factory=list)
+    lint_summaries: list[LintSummary] = field(default_factory=list)
+    coverage_percent: float | None = None
+    coverage_source: str = ""
+    tools_run: list[str] = field(default_factory=list)
+    tools_skipped: list[tuple[str, str]] = field(default_factory=list)  # (name, reason)
+
+
+@dataclass(slots=True)
 class AuditReport:
     """Complete deterministic repository audit."""
 
@@ -137,6 +171,7 @@ class AuditReport:
     quality: QualitySignals
     architecture: ArchitectureSummary
     risk: RiskReport
+    security: SecuritySummary | None = None
 
     def to_dict(self) -> dict[str, Any]:
         """Return a JSON-serializable representation of the report."""

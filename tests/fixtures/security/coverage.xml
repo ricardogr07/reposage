@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<coverage version="7.4.0" timestamp="1705312800" lines-valid="500" lines-covered="410" line-rate="0.82" branches-covered="0" branches-valid="0" branch-rate="0" complexity="0">
+    <packages>
+        <package name="src" line-rate="0.82" branch-rate="0" complexity="0">
+            <classes>
+                <class name="app.py" filename="src/app.py" line-rate="0.90" branch-rate="0" complexity="0">
+                    <lines>
+                        <line number="1" hits="1"/>
+                        <line number="10" hits="1"/>
+                        <line number="20" hits="0"/>
+                    </lines>
+                </class>
+            </classes>
+        </package>
+    </packages>
+</coverage>

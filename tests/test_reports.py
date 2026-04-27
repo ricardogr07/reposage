@@ -25,6 +25,7 @@ def test_json_report_has_expected_shape() -> None:
     report = build_audit_report(fixture_path("python_repo"))
     payload = json.loads(render_json_report(report))
 
-    assert set(payload) == {"architecture", "dependencies", "inventory", "quality", "risk"}
+    expected_keys = {"architecture", "dependencies", "inventory", "quality", "risk", "security"}
+    assert set(payload) == expected_keys
     assert payload["inventory"]["project_name"] == "python_repo"
     assert payload["quality"]["has_tests"] is True
