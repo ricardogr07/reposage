@@ -47,8 +47,11 @@ def test_run_or_load_returns_none_when_no_tool_and_no_file(tmp_path: Path) -> No
 
 
 def test_parse_pip_audit_fixture(tmp_path: Path) -> None:
-    shutil.copy(SECURITY_FIXTURES / "pip-audit-report.json", tmp_path / "pip-audit-report.json")
-    findings, skip_reason = scan_pip_audit(tmp_path)
+    from unittest.mock import patch
+
+    fixture_content = (SECURITY_FIXTURES / "pip-audit-report.json").read_text(encoding="utf-8")
+    with patch("reposage.security.pip_audit.run_or_load", return_value=fixture_content):
+        findings, skip_reason = scan_pip_audit(tmp_path)
     assert skip_reason == ""
     assert len(findings) == 2
     assert all(f.ecosystem == "python" for f in findings)
@@ -95,8 +98,11 @@ def test_parse_bandit_invalid_json(tmp_path: Path) -> None:
 
 
 def test_parse_npm_audit_fixture(tmp_path: Path) -> None:
-    shutil.copy(SECURITY_FIXTURES / "npm-audit.json", tmp_path / "npm-audit.json")
-    findings, skip_reason = scan_npm_audit(tmp_path)
+    from unittest.mock import patch
+
+    fixture_content = (SECURITY_FIXTURES / "npm-audit.json").read_text(encoding="utf-8")
+    with patch("reposage.security.npm_audit.run_or_load", return_value=fixture_content):
+        findings, skip_reason = scan_npm_audit(tmp_path)
     assert skip_reason == ""
     assert len(findings) == 1
     vuln = findings[0]
@@ -109,8 +115,11 @@ def test_parse_npm_audit_fixture(tmp_path: Path) -> None:
 
 
 def test_parse_eslint_fixture(tmp_path: Path) -> None:
-    shutil.copy(SECURITY_FIXTURES / "eslint-report.json", tmp_path / "eslint-report.json")
-    lint, skip_reason = scan_eslint(tmp_path)
+    from unittest.mock import patch
+
+    fixture_content = (SECURITY_FIXTURES / "eslint-report.json").read_text(encoding="utf-8")
+    with patch("reposage.security.eslint_scan.run_or_load", return_value=fixture_content):
+        lint, skip_reason = scan_eslint(tmp_path)
     assert skip_reason == ""
     assert lint is not None
     assert lint.error_count == 1
