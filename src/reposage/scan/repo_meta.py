@@ -22,6 +22,13 @@ FRAMEWORK_NAMES = {
     "vue": "Vue",
 }
 
+FRAMEWORK_PREFIXES = {
+    "org.springframework.boot:": "Spring Boot",
+    "io.quarkus:": "Quarkus",
+    "io.micronaut:": "Micronaut",
+    "jakarta.": "Jakarta EE",
+}
+
 
 def build_inventory(
     root: Path,
@@ -73,6 +80,12 @@ def _detect_frameworks(
     for dependency_name, framework_name in FRAMEWORK_NAMES.items():
         if dependency_name in dependency_names:
             detected.add(framework_name)
+
+    for dep in dependencies.dependencies:
+        dep_name = dep.name.lower()
+        for prefix, framework_name in FRAMEWORK_PREFIXES.items():
+            if dep_name.startswith(prefix):
+                detected.add(framework_name)
 
     file_names = Counter(PurePosixPath(record.path).name.lower() for record in file_records)
     if "manage.py" in file_names:

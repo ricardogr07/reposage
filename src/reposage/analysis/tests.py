@@ -28,4 +28,6 @@ def _is_test_file(path: str) -> bool:
     if any(part.lower() in TEST_DIRECTORY_NAMES for part in pure_path.parts):
         return True
     file_name = pure_path.name.lower()
-    return file_name.startswith("test_") or file_name.endswith(("_test.py", ".spec.ts", ".spec.js"))
+    return file_name.startswith("test_") or file_name.endswith(
+        ("_test.py", ".spec.ts", ".spec.js", "test.java", "spec.java")
+    )

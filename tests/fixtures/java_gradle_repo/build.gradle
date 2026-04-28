@@ -1,0 +1,16 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.example'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.quarkus:quarkus-resteasy:3.6.0'
+    implementation 'io.quarkus:quarkus-arc:3.6.0'
+    testImplementation 'io.quarkus:quarkus-junit5:3.6.0'
+}
