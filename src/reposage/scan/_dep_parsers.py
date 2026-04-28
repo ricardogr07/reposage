@@ -1,10 +1,11 @@
-"""Format-specific dependency parsers for pyproject.toml, requirements, and package.json."""
+"""Format-specific dependency parsers for pyproject.toml, requirements, package.json, pom.xml, and Gradle."""  # noqa: E501
 
 from __future__ import annotations
 
 import json
 import re
 import tomllib
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from reposage.models import Dependency
@@ -183,6 +184,85 @@ def _dependencies_from_mapping(
                 ecosystem=ecosystem,
                 source_file=source_file,
                 group=group,
+            )
+        )
+    return dependencies
+
+
+_MAVEN_NS = "{http://maven.apache.org/POM/4.0.0}"
+_SCOPE_TO_GROUP: dict[str, str] = {"test": "test", "provided": "provided"}
+
+_GRADLE_DEP_RE = re.compile(
+    r"""^\s*(\w+)\s*(?:\(|'|")([A-Za-z][\w.\-]*):([A-Za-z][\w.\-]*):([^\s'")\n]+)""",
+    re.MULTILINE,
+)
+_GRADLE_GROUPS: dict[str, str] = {
+    "implementation": "runtime",
+    "api": "runtime",
+    "runtimeOnly": "runtime",
+    "testImplementation": "test",
+    "testRuntimeOnly": "test",
+    "testCompileOnly": "test",
+    "compileOnly": "provided",
+    "provided": "provided",
+}
+
+
+def _parse_pom_xml(path: Path, relative_path: str) -> list[Dependency]:
+    try:
+        root = ET.parse(path).getroot()
+    except (OSError, ET.ParseError):
+        return []
+
+    deps_el = root.find(f"{_MAVEN_NS}dependencies")
+    if deps_el is None:
+        return []
+
+    dependencies: list[Dependency] = []
+    for dep in deps_el.findall(f"{_MAVEN_NS}dependency"):
+        gid_el = dep.find(f"{_MAVEN_NS}groupId")
+        aid_el = dep.find(f"{_MAVEN_NS}artifactId")
+        if gid_el is None or aid_el is None:
+            continue
+        group_id = (gid_el.text or "").strip()
+        artifact_id = (aid_el.text or "").strip()
+        if not group_id or not artifact_id:
+            continue
+
+        ver_el = dep.find(f"{_MAVEN_NS}version")
+        version = (ver_el.text or "").strip() if ver_el is not None else ""
+
+        scope_el = dep.find(f"{_MAVEN_NS}scope")
+        scope = (scope_el.text or "").strip().lower() if scope_el is not None else ""
+
+        dependencies.append(
+            Dependency(
+                name=f"{group_id}:{artifact_id}".lower(),
+                version_spec=version or "*",
+                ecosystem="maven",
+                source_file=relative_path,
+                group=_SCOPE_TO_GROUP.get(scope, "runtime"),
+            )
+        )
+    return dependencies
+
+
+def _parse_build_gradle(path: Path, relative_path: str) -> list[Dependency]:
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return []
+
+    dependencies: list[Dependency] = []
+    for m in _GRADLE_DEP_RE.finditer(text):
+        config, group_id, artifact_id, version = m.group(1), m.group(2), m.group(3), m.group(4)
+        dependencies.append(
+            Dependency(
+                name=f"{group_id}:{artifact_id}".lower(),
+                version_spec=version.strip() or "*",
+                ecosystem="maven",
+                source_file=relative_path,
+                group=_GRADLE_GROUPS.get(config, "runtime"),
             )
         )
     return dependencies
