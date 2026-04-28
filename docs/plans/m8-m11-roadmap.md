@@ -9,7 +9,7 @@
 | [M10](#m10--java-language-support) | Java Language Support | M |
 | [M11](#m11--api-surface-analysis) | API Surface Analysis | XL |
 
-Rust and C# language support are planned follow-on milestones after M11.
+Rust and C# language support are planned as M12 and M13 — see [m12-m13-roadmap.md](m12-m13-roadmap.md).
 
 ---
 
