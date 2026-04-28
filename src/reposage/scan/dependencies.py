@@ -7,6 +7,7 @@ from pathlib import Path, PurePosixPath
 from reposage.models import Dependency, DependencySummary, FileRecord
 from reposage.scan._dep_parsers import (
     _parse_build_gradle,
+    _parse_cargo_toml,
     _parse_package_json,
     _parse_pom_xml,
     _parse_pyproject,
@@ -17,6 +18,7 @@ _PYPROJECT = "pyproject.toml"
 _PACKAGE_JSON = "package.json"
 _REQUIREMENTS_PREFIX = "requirements"
 _JAVA_MANIFESTS = {"pom.xml", "build.gradle", "build.gradle.kts"}
+_RUST_MANIFESTS = {"Cargo.toml"}
 
 
 def summarize_dependencies(root: Path, file_records: list[FileRecord]) -> DependencySummary:
@@ -44,6 +46,8 @@ def summarize_dependencies(root: Path, file_records: list[FileRecord]) -> Depend
             parsed_dependencies = _parse_pom_xml(absolute_path, manifest_path)
         elif file_name in {"build.gradle", "build.gradle.kts"}:
             parsed_dependencies = _parse_build_gradle(absolute_path, manifest_path)
+        elif file_name == "Cargo.toml":
+            parsed_dependencies = _parse_cargo_toml(absolute_path, manifest_path)
         else:
             parsed_dependencies = _parse_requirements(absolute_path, manifest_path)
 
@@ -93,4 +97,5 @@ def _is_supported_manifest(file_name: str) -> bool:
         file_name in (_PYPROJECT, _PACKAGE_JSON)
         or file_name.startswith(_REQUIREMENTS_PREFIX)
         or file_name in _JAVA_MANIFESTS
+        or file_name in _RUST_MANIFESTS
     )
