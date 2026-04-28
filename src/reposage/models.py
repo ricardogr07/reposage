@@ -163,6 +163,28 @@ class SecuritySummary:
 
 
 @dataclass(slots=True)
+class TSConfig:
+    """Parsed TypeScript compiler configuration."""
+
+    strict: bool = False
+    no_implicit_any: bool = False
+    strict_null_checks: bool = False
+    no_unchecked_indexed_access: bool = False
+    target: str = ""
+    module: str = ""
+    path_aliases: bool = False
+
+
+@dataclass(slots=True)
+class TSCodeSignals:
+    """Heuristic signals from TypeScript source analysis."""
+
+    any_usage_count: int = 0
+    untyped_exports: int = 0
+    type_assertion_count: int = 0
+
+
+@dataclass(slots=True)
 class AuditReport:
     """Complete deterministic repository audit."""
 
@@ -172,6 +194,8 @@ class AuditReport:
     architecture: ArchitectureSummary
     risk: RiskReport
     security: SecuritySummary | None = None
+    ts_config: TSConfig | None = None
+    ts_analysis: TSCodeSignals | None = None
 
     def to_dict(self) -> dict[str, Any]:
         """Return a JSON-serializable representation of the report."""
