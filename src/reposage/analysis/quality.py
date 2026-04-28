@@ -18,6 +18,9 @@ LINT_FILE_NAMES = {
     "eslint.config.cjs",
     ".ruff.toml",
     "ruff.toml",
+    "checkstyle.xml",
+    "pmd.xml",
+    "spotbugs.xml",
 }
 TYPE_FILE_NAMES = {"mypy.ini", "pyrightconfig.json", "py.typed", "tsconfig.json"}
 
@@ -116,6 +119,9 @@ def analyze_quality(
                 " — array index access can silently be undefined."
             )
 
+    java_present = any(r.extension == ".java" for r in file_records)
+    typing_present = bool(typing_files) or java_present
+
     present_count = sum(
         [
             bool(test_files),
@@ -123,7 +129,7 @@ def analyze_quality(
             bool(documentation_files),
             bool(packaging_files),
             bool(lint_files),
-            bool(typing_files),
+            typing_present,
         ]
     )
     score = int((present_count / 6) * 100)
@@ -140,7 +146,7 @@ def analyze_quality(
         packaging_files=packaging_files,
         lint_present=bool(lint_files),
         lint_files=lint_files,
-        typing_present=bool(typing_files),
+        typing_present=typing_present,
         typing_files=typing_files,
         checklist=checklist,
         missing_signals=missing_signals,
