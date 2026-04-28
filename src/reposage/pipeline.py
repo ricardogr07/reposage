@@ -8,7 +8,7 @@ from reposage.analysis.architecture import analyze_architecture
 from reposage.analysis.quality import analyze_quality
 from reposage.analysis.risk import analyze_risk
 from reposage.config import DEFAULT_SCAN_CONFIG, ScanConfig
-from reposage.models import AuditReport
+from reposage.models import AuditReport, FileRecord, TSCodeSignals, TSConfig
 from reposage.scan.dependencies import summarize_dependencies
 from reposage.scan.filesystem import scan_repository
 from reposage.scan.languages import detect_languages
@@ -32,7 +32,10 @@ def build_audit_report(root: Path, config: ScanConfig | None = None) -> AuditRep
         dependencies=dependencies,
         config=active_config,
     )
-    quality = analyze_quality(resolved_root, file_records)
+
+    ts_config, ts_analysis = _analyze_typescript(resolved_root, file_records)
+
+    quality = analyze_quality(resolved_root, file_records, ts_config=ts_config)
     architecture = analyze_architecture(
         file_records=file_records,
         top_level_entries=inventory.top_level_entries,
@@ -47,4 +50,23 @@ def build_audit_report(root: Path, config: ScanConfig | None = None) -> AuditRep
         quality=quality,
         architecture=architecture,
         risk=risk,
+        ts_config=ts_config,
+        ts_analysis=ts_analysis,
     )
+
+
+def _analyze_typescript(
+    root: Path,
+    file_records: list[FileRecord],
+) -> tuple[TSConfig | None, TSCodeSignals | None]:
+    ts_files = [r for r in file_records if r.extension in {".ts", ".tsx"}]
+    if not ts_files:
+        return None, None
+
+    from reposage.scan.ts_analysis import analyze_typescript
+    from reposage.scan.ts_config import parse_tsconfig
+
+    tsconfig_path = root / "tsconfig.json"
+    ts_config = parse_tsconfig(tsconfig_path) if tsconfig_path.exists() else None
+    ts_analysis = analyze_typescript(root, ts_files)
+    return ts_config, ts_analysis

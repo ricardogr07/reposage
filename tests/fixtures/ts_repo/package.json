@@ -1,0 +1,11 @@
+{
+  "name": "ts-repo",
+  "version": "1.0.0",
+  "dependencies": {
+    "@angular/core": "^17.0.0",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

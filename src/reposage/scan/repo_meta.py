@@ -9,6 +9,8 @@ from reposage.config import ScanConfig
 from reposage.models import DependencySummary, FileRecord, LanguageStat, RepoInventory
 
 FRAMEWORK_NAMES = {
+    "@angular/core": "Angular",
+    "@nestjs/core": "NestJS",
     "django": "Django",
     "express": "Express",
     "fastapi": "FastAPI",
@@ -77,5 +79,10 @@ def _detect_frameworks(
         detected.add("Django")
     if "next.config.js" in file_names or "next.config.mjs" in file_names:
         detected.add("Next.js")
+    deno_names = {"deno.json", "deno.jsonc"}
+    if any(PurePosixPath(record.path).name in deno_names for record in file_records):
+        detected.add("Deno")
+    if any(PurePosixPath(record.path).name == "bun.lockb" for record in file_records):
+        detected.add("Bun")
 
     return sorted(detected)

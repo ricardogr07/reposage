@@ -6,7 +6,7 @@ import tomllib
 from pathlib import Path, PurePosixPath
 
 from reposage.analysis.tests import detect_test_files
-from reposage.models import FileRecord, QualitySignals
+from reposage.models import FileRecord, QualitySignals, TSConfig
 
 CI_FILE_NAMES = {".gitlab-ci.yml", "azure-pipelines.yml"}
 PACKAGING_FILES = {"pyproject.toml", "package.json", "setup.cfg", "setup.py"}
@@ -22,7 +22,11 @@ LINT_FILE_NAMES = {
 TYPE_FILE_NAMES = {"mypy.ini", "pyrightconfig.json", "py.typed", "tsconfig.json"}
 
 
-def analyze_quality(root: Path, file_records: list[FileRecord]) -> QualitySignals:
+def analyze_quality(
+    root: Path,
+    file_records: list[FileRecord],
+    ts_config: TSConfig | None = None,
+) -> QualitySignals:
     """Build engineering quality signals from repository contents."""
 
     all_paths = {file_record.path for file_record in file_records}
@@ -92,6 +96,25 @@ def analyze_quality(root: Path, file_records: list[FileRecord]) -> QualitySignal
         checklist,
         missing_signals,
     )
+
+    if ts_config is not None:
+        if not ts_config.strict:
+            missing_signals.append("TypeScript strict mode not enabled — allows silent type holes.")
+        if not ts_config.no_implicit_any:
+            missing_signals.append(
+                "TypeScript noImplicitAny not enabled"
+                " — untyped parameters are the largest source of TS runtime errors."
+            )
+        if not ts_config.strict_null_checks:
+            missing_signals.append(
+                "TypeScript strictNullChecks not enabled"
+                " — null and undefined are assignable to any type."
+            )
+        if not ts_config.no_unchecked_indexed_access:
+            missing_signals.append(
+                "TypeScript noUncheckedIndexedAccess not enabled"
+                " — array index access can silently be undefined."
+            )
 
     present_count = sum(
         [
