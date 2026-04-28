@@ -3,7 +3,14 @@
 from __future__ import annotations
 
 from reposage.enrichment.models import EnrichmentResult
-from reposage.models import AuditReport, Dependency, LanguageStat, SecuritySummary
+from reposage.models import (
+    AuditReport,
+    Dependency,
+    LanguageStat,
+    SecuritySummary,
+    TSCodeSignals,
+    TSConfig,
+)
 
 
 def render_markdown_report(report: AuditReport, enrichment: EnrichmentResult | None = None) -> str:
@@ -69,6 +76,9 @@ def render_markdown_report(report: AuditReport, enrichment: EnrichmentResult | N
         ]
     )
 
+    if report.ts_config is not None or report.ts_analysis is not None:
+        lines.extend(["", *_render_ts(report.ts_config, report.ts_analysis).splitlines()])
+
     if report.security is not None:
         lines.extend(["", *_render_security(report.security).splitlines()])
 
@@ -76,6 +86,42 @@ def render_markdown_report(report: AuditReport, enrichment: EnrichmentResult | N
         lines.extend(_render_enrichment(enrichment))
 
     return "\n".join(lines).rstrip() + "\n"
+
+
+def _render_ts(ts_config: TSConfig | None, ts_analysis: TSCodeSignals | None) -> str:
+    lines = ["## TypeScript", ""]
+
+    if ts_config is not None:
+        lines.append("**Compiler settings:**")
+        flags = [
+            ("strict", ts_config.strict),
+            ("noImplicitAny", ts_config.no_implicit_any),
+            ("strictNullChecks", ts_config.strict_null_checks),
+            ("noUncheckedIndexedAccess", ts_config.no_unchecked_indexed_access),
+        ]
+        for name, enabled in flags:
+            status = "✓" if enabled else "✗"
+            lines.append(f"- {status} `{name}`")
+        if ts_config.target:
+            lines.append(f"- target: `{ts_config.target}`")
+        if ts_config.module:
+            lines.append(f"- module: `{ts_config.module}`")
+        if ts_config.path_aliases:
+            lines.append("- path aliases configured")
+    else:
+        lines.append("_No tsconfig.json found._")
+
+    if ts_analysis is not None:
+        lines += [
+            "",
+            "**Code signals:**",
+            f"- `any` usage count: {ts_analysis.any_usage_count}",
+            f"- Untyped exports: {ts_analysis.untyped_exports}",
+            f"- Non-any type assertions: {ts_analysis.type_assertion_count}",
+        ]
+
+    lines.append("")
+    return "\n".join(lines)
 
 
 def _render_security(security: SecuritySummary) -> str:
