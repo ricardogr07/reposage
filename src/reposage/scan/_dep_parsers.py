@@ -1,4 +1,4 @@
-"""Format-specific dependency parsers for pyproject.toml, requirements, package.json, pom.xml, and Gradle."""  # noqa: E501
+"""Format-specific dependency parsers for pyproject.toml, requirements, package.json, pom.xml, Gradle, and Cargo.toml."""  # noqa: E501
 
 from __future__ import annotations
 
@@ -263,6 +263,64 @@ def _parse_build_gradle(path: Path, relative_path: str) -> list[Dependency]:
                 ecosystem="maven",
                 source_file=relative_path,
                 group=_GRADLE_GROUPS.get(config, "runtime"),
+            )
+        )
+    return dependencies
+
+
+_CARGO_SECTION_TO_GROUP: dict[str, str] = {
+    "dependencies": "runtime",
+    "dev-dependencies": "dev",
+    "build-dependencies": "build",
+}
+
+
+def _parse_cargo_toml(path: Path, relative_path: str) -> list[Dependency]:
+    try:
+        data = tomllib.loads(path.read_text(encoding="utf-8"))
+    except (OSError, tomllib.TOMLDecodeError):
+        return []
+
+    # Workspace-only manifest (no [package]) — member Cargo.tomls are scanned individually
+    is_workspace = "workspace" in data
+    is_package = "package" in data
+    if is_workspace and not is_package:
+        workspace_deps = data.get("workspace", {}).get("dependencies", {})
+        return _cargo_deps_from_section(workspace_deps, "runtime", relative_path)
+
+    dependencies: list[Dependency] = []
+    for section, group in _CARGO_SECTION_TO_GROUP.items():
+        section_data = data.get(section, {})
+        dependencies.extend(_cargo_deps_from_section(section_data, group, relative_path))
+    return dependencies
+
+
+def _cargo_deps_from_section(
+    section: object,
+    group: str,
+    relative_path: str,
+) -> list[Dependency]:
+    if not isinstance(section, dict):
+        return []
+    dependencies: list[Dependency] = []
+    for name, value in section.items():
+        if not isinstance(name, str):
+            continue
+        if value is False:
+            continue
+        if isinstance(value, str):
+            version_spec = value
+        elif isinstance(value, dict):
+            version_spec = str(value.get("version", "")) or "*"
+        else:
+            version_spec = "*"
+        dependencies.append(
+            Dependency(
+                name=name,
+                version_spec=version_spec or "*",
+                ecosystem="cargo",
+                source_file=relative_path,
+                group=group,
             )
         )
     return dependencies
