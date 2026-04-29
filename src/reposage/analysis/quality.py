@@ -11,6 +11,7 @@ from reposage.models import FileRecord, QualitySignals, TSConfig
 CI_FILE_NAMES = {".gitlab-ci.yml", "azure-pipelines.yml"}
 PACKAGING_FILES = {"pyproject.toml", "package.json", "setup.cfg", "setup.py"}
 LINT_FILE_NAMES = {
+    ".editorconfig",
     ".eslintrc",
     ".eslintrc.json",
     "eslint.config.js",
@@ -123,8 +124,9 @@ def analyze_quality(
 
     java_present = any(r.extension == ".java" for r in file_records)
     rust_present = any(r.extension == ".rs" for r in file_records)
-    # Rust and Java are statically typed; no config file needed as evidence
-    typing_present = bool(typing_files) or java_present or rust_present
+    csharp_present = any(r.extension == ".cs" for r in file_records)
+    # Statically typed languages; no config file needed as evidence
+    typing_present = bool(typing_files) or java_present or rust_present or csharp_present
 
     present_count = sum(
         [

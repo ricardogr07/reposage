@@ -8,7 +8,7 @@ from reposage.models import FileRecord
 
 TEST_DIRECTORY_NAMES = {"__tests__", "spec", "specs", "test", "tests"}
 
-TEST_EXTENSIONS = {".py", ".ts", ".tsx", ".js", ".jsx", ".rb", ".go", ".rs", ".java"}
+TEST_EXTENSIONS = {".py", ".ts", ".tsx", ".js", ".jsx", ".rb", ".go", ".rs", ".java", ".cs"}
 
 
 def detect_test_files(file_records: list[FileRecord]) -> list[str]:
@@ -29,5 +29,14 @@ def _is_test_file(path: str) -> bool:
         return True
     file_name = pure_path.name.lower()
     return file_name.startswith("test_") or file_name.endswith(
-        ("_test.py", ".spec.ts", ".spec.js", "test.java", "spec.java")
+        (
+            "_test.py",
+            ".spec.ts",
+            ".spec.js",
+            "test.java",
+            "spec.java",
+            "test.cs",
+            "tests.cs",
+            "spec.cs",
+        )
     )

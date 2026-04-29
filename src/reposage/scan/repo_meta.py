@@ -36,6 +36,15 @@ FRAMEWORK_PREFIXES = {
     "io.quarkus:": "Quarkus",
     "io.micronaut:": "Micronaut",
     "jakarta.": "Jakarta EE",
+    # .NET / NuGet prefix matching (more-specific before less-specific)
+    "microsoft.aspnetcore.components": "Blazor",
+    "microsoft.aspnetcore": "ASP.NET Core",
+    "microsoft.entityframeworkcore": "Entity Framework Core",
+    "microsoft.maui": ".NET MAUI",
+    "grpc.aspnetcore": "gRPC",
+    "masstransit": "MassTransit",
+    "hangfire": "Hangfire",
+    "dapper": "Dapper",
 }
 
 
