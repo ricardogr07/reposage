@@ -1,7 +1,7 @@
 # AGENTS.md — RepoSage Worker Instructions
 
-This file is read by all Codex workers before touching any code. Follow it exactly.
-No interpretation. No improvisation. No scope creep.
+This file is read by all AI agents and Codex workers before touching any code. Follow it
+exactly. No interpretation. No improvisation. No scope creep.
 
 ---
 
@@ -15,47 +15,78 @@ summary, engineering quality signals, architecture observations, and risk items.
 
 ```
 src/reposage/
-  __init__.py          — version string
-  __main__.py          — python -m reposage entry point
-  cli.py               — Click-based CLI (report, scan subcommands)
-  config.py            — ScanConfig dataclass with tunable parameters
-  models.py            — ALL shared dataclasses (FileRecord, RepoInventory,
-                         DependencySummary, QualitySignals, ArchitectureSummary,
-                         RiskReport, AuditReport, …)
-  pipeline.py          — build_audit_report(): wires scan → analysis → report
+  __init__.py              — version string
+  __main__.py              — python -m reposage entry point
+  cli.py                   — Click-based CLI (report, run subcommands)
+  config.py                — ScanConfig and EnrichConfig dataclasses
+  models.py                — ALL shared dataclasses (FileRecord, RepoInventory,
+                             DependencySummary, QualitySignals, ArchitectureSummary,
+                             RiskReport, AuditReport, …)
+  pipeline.py              — build_audit_report(): wires scan → analysis → report
   scan/
-    filesystem.py      — walk repo tree, apply ignore policy
-    languages.py       — map file extensions to language names
-    repo_meta.py       — build_inventory(): aggregate FileRecords into RepoInventory
-    dependencies.py    — parse pyproject.toml / requirements*.txt / package.json
+    filesystem.py          — walk repo tree, apply ignore policy
+    languages.py           — map extensions to language names; framework signals
+    repo_meta.py           — build_inventory(): aggregate FileRecords into RepoInventory
+    dependencies.py        — manifest detection and dispatch
+    _dep_parsers.py        — Python/JS/TS/Ruby/Go/Java/Rust manifest parsers
+    _dep_parsers_dotnet.py — NuGet parsers (.csproj, packages.config, Directory.Packages.props)
+    ts_analysis.py         — TypeScript code-quality signals
+    ts_config.py           — tsconfig.json parsing
   analysis/
-    tests.py           — detect_test_files(), _is_test_file()
-    quality.py         — score_quality_signals()
-    architecture.py    — summarise_architecture()
-    risk.py            — analyze_risk()
+    tests.py               — detect_test_files(), _is_test_file()
+    quality.py             — score_quality_signals()
+    architecture.py        — summarise_architecture()
+    risk.py                — analyze_risk()
+  enrichment/
+    provider.py            — EnrichmentProvider Protocol + enrich_report() dispatcher
+    models.py              — EnrichmentResult, ModuleRole, DebtItem, Improvement dataclasses
+    anthropic_provider.py  — Anthropic SDK implementation
+    openai_provider.py     — OpenAI SDK implementation
+    classify_prompt.py     — module-role classification prompt + JSON schema
+    debt_prompt.py         — technical-debt prompt + JSON schema
+    synthesis_prompt.py    — top-improvements prompt + JSON schema
   reports/
-    markdown.py        — render_markdown_report()
-    json_report.py     — render_json_report()
+    markdown.py            — render_markdown_report()
+    json_report.py         — render_json_report()
+  api/
+    surface.py             — API surface extraction
+    _all_extractor.py      — collect all exported symbols
+    _git_history.py        — git-history churn signals
+    _symbol_extractor.py   — per-file symbol extraction
+  security/
+    scan.py                — security scan orchestration
+    bandit_scan.py         — bandit integration
+    eslint_scan.py         — eslint integration
+    npm_audit.py           — npm audit integration
+    pip_audit.py           — pip-audit integration
+    ruff_scan.py           — ruff integration
+    coverage_parser.py     — coverage report parsing
+    _runner.py             — subprocess runner
+  server/
+    app.py                 — FastMCP HTTP server exposing audit_repository tool
 
 tests/
-  conftest.py          — fixture_path() helper
-  fixtures/            — static repos used as test inputs (NOT scanned by pytest)
+  conftest.py              — fixture_path() helper
+  fixtures/                — static repos used as scan inputs (NOT collected by pytest)
+    api_repo/
+    csharp_repo/
+    java_gradle_repo/
+    java_maven_repo/
     js_repo/
-    mixed_repo/
     missing_signals_repo/
+    mixed_repo/
     monorepo_repo/
     python_repo/
-  test_cli.py
-  test_dependencies.py
-  test_quality.py
-  test_reports.py
-  test_scan.py
+    rust_repo/
+    security/
+    ts_repo/
 ```
 
 **Key invariants:**
 - Zero runtime dependencies. `dependencies = []` in `pyproject.toml`. Never add one.
 - All shared data types live in `models.py`. Do not define dataclasses elsewhere.
 - `tests/fixtures/` is excluded from pytest collection via `norecursedirs`.
+- No source file in `src/reposage/` may exceed 400 lines. `tox -e linecount` enforces this.
 
 ---
 
@@ -84,12 +115,22 @@ python -m pytest tests/ --cov=reposage --cov-report=term-missing
 Coverage is collected automatically via `addopts` in `pyproject.toml`; you do not need to
 pass `--cov` manually when using `python -m pytest`.
 
+**Enrichment tests (requires `reposage[ai]`):**
+```bash
+tox -e ai
+```
+
+**MCP server tests (requires `reposage[server]`):**
+```bash
+tox -e server
+```
+
 **Coverage requirement:** No module may drop below its current coverage after your change.
-Target ≥ 90% across all non-stub modules; target ≥ 95% on `scan/dependencies.py`.
+Target ≥ 90% across all non-stub modules.
 
 ---
 
-## 3. How to Run Linting and Type Checks
+## 3. How to Run Linting, Type Checks, and Quality Gates
 
 ```bash
 # Lint + format check
@@ -107,9 +148,12 @@ python -m mypy src
 
 # Package build check
 tox -e pkg
+
+# File size check — 400-line ceiling per source file
+tox -e linecount
 ```
 
-**All four gates must be green before a commit:** `py312`, `lint`, `type`, `pkg`.
+**All five gates must be green before a commit:** `py312`, `lint`, `type`, `pkg`, `linecount`.
 
 Fix every ruff and mypy violation your change introduces. Do not suppress them with
 `# noqa` or `# type: ignore` unless the violation is a known false positive in an
@@ -119,29 +163,26 @@ unrelated line that pre-existed your change — and even then, do not add new su
 
 ## 4. Commit Conventions
 
-- **One issue, one commit.** Never batch multiple fixes.
+- **One logical change, one commit.** Never batch multiple fixes or features.
 - **Imperative mood, lowercase subject, no trailing period.**
-  - Good: `fix(P1-3): skip url and vcs lines in _parse_requirements`
-  - Bad: `Fixed parsing bug.`, `Fixes P1-3 and also cleaned up imports`
+  - Good: `fix(scan): skip url and vcs lines in _parse_requirements`
+  - Bad: `Fixed parsing bug.`, `Fix two things`
 - **No AI attribution lines.** No `Co-Authored-By:`, no `Generated by`, no `🤖`.
-- **Format:** `fix(ISSUE-ID): short description` for bug fixes,
-  `chore(ISSUE-ID): short description` for housekeeping.
+- **Prefix format:** `fix:` for bug fixes, `feat:` for features, `chore:` for housekeeping,
+  `docs:` for documentation, `test:` for tests only.
 - Body is optional. If included, wrap at 72 characters and explain *why*, not *what*.
 
 ---
 
 ## 5. Fix Protocol
 
-You receive **one task at a time** from the fix queue in section 8.
-
-1. Read the task description in full before writing any code.
-2. Read every file you will modify before touching it.
-3. Implement exactly what is described. Nothing more.
-4. Add or update tests that cover the new behaviour (see section 6).
-5. Run `python -m pytest tests/ -q` and confirm all tests pass.
-6. Run `python -m ruff check src tests` and `python -m mypy src` — fix all new violations.
-7. Commit with the correct message format.
-8. Stop. Do not move on to the next task.
+1. Read every file you will modify before touching it.
+2. Implement exactly what is described. Nothing more.
+3. Add or update tests that cover the new behaviour (see section 6).
+4. Run `python -m pytest tests/ -q` and confirm all tests pass.
+5. Run `tox -e lint` and `tox -e linecount` — fix all new violations.
+6. Commit with the correct message format.
+7. Stop. Do not move on to the next task without being asked.
 
 If the task description says "add a guard" — add the guard. If it says "delete the file" —
 delete the file. Do not refactor adjacent code, rename variables, reorder imports, or add
@@ -151,8 +192,7 @@ docstrings to functions you did not change.
 
 ## 6. Test Requirements
 
-- Every fix must ship with at least one test that would have **caught the original bug**
-  if it had existed before the fix.
+- Every fix must ship with at least one test that covers the changed behaviour.
 - Negative tests (asserting something is NOT in a result) are often the right choice for
   guard/filter fixes.
 - Use `tmp_path: Path` (pytest built-in) for any test that needs a temp directory.
@@ -167,269 +207,27 @@ docstrings to functions you did not change.
 
 ## 7. What NOT to Do
 
-- **No batch commits.** One issue per commit, always.
+- **No batch commits.** One logical change per commit, always.
 - **No Co-Authored-By or AI attribution** of any kind in commit messages.
-- **No touching files outside the stated scope.** If the task says "edit
-  `scan/dependencies.py`", do not also edit `cli.py` or `README.md`.
+- **No touching files outside the stated scope.**
 - **No skipping tests.** Do not use `pytest.mark.skip`, `pytest.mark.xfail`, or
-  commenting out assertions to make tests pass.
+  comment out assertions to make tests pass.
 - **No `# type: ignore` shortcuts** to silence mypy on code you wrote.
 - **No `# noqa` shortcuts** to silence ruff on code you wrote.
 - **No adding runtime dependencies.** `dependencies = []` must remain empty.
 - **No importing from `src/` with sys.path hacks.** The package is installed in the
   test env by tox; imports work without path manipulation.
-- **No speculative improvements.** If a function next to the one you are fixing looks
-  like it could use a refactor — leave it alone. Scope is exactly what was asked.
+- **No speculative improvements.** Scope is exactly what was asked.
+- **No file over 400 lines.** Split by responsibility into a sibling module when a file
+  approaches the limit (e.g., `_dep_parsers_dotnet.py` splits NuGet parsers from
+  `_dep_parsers.py`). `tox -e linecount` will fail the build if this is violated.
 
 ---
 
-## 8. Current Fix Queue
-
-Complete in this exact order. Each item is one commit.
-
-**Already fixed (do not re-do):**
-- ~~P0-1~~: Initial commit on branch `chore/bootstrap-public-foundation` — done
-- ~~P0-3~~: Removed `total_files` from `RepoInventory` — done
-- ~~P0-4~~: Removed `-p no:tmpdir`; refactored `test_scan.py` to use `tmp_path` — done
-- ~~P1-4~~: Added `TEST_EXTENSIONS` guard to `_is_test_file` — done
-
----
-
-### P1-3 — `_parse_requirements` silently corrupts data for URL/VCS/option lines
-
-**File:** `src/reposage/scan/dependencies.py`
-
-In `_parse_requirements`, add a guard before the regex match:
-
-```python
-if line.startswith(("-", "http://", "https://", "git+")):
-    continue
-```
-
-This prevents lines like `https://github.com/...`, `git+https://...`, `-e .`,
-`--hash=sha256:...` from being matched as package names.
-
-**Test:** Add a `requirements.txt` fixture (inline in the test, using `tmp_path`) that
-contains URL, VCS, editable, and hash lines alongside two real packages. Assert that only
-the two real packages appear in the result. Add to `tests/test_dependencies.py`.
-
----
-
-### P1-2 — mypy config is too weak (missing `disallow_untyped_defs`)
-
-**File:** `pyproject.toml`
-
-Add to `[tool.mypy]`:
-
-```toml
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-```
-
-Then run `tox -e type`. Fix every new mypy violation that surfaces in `src/reposage/`.
-Do not add `# type: ignore` — fix the actual type annotations.
-
-**Test:** No new test needed; `tox -e type` passing is the acceptance criterion.
-
----
-
-### P1-6 — Cache artifacts committed into fixture repos
-
-**Files:** `tests/fixtures/`, `.gitignore`
-
-1. Delete `tests/fixtures/mixed_repo/.ruff_cache/` (entire directory tree).
-2. Delete `tests/fixtures/python_repo/.ruff_cache/` (entire directory tree).
-3. Check for and delete any `__pycache__/` or `.pytest_cache/` directories under
-   `tests/fixtures/`.
-4. Add these lines to `.gitignore`:
-   ```
-   tests/fixtures/**/.ruff_cache/
-   tests/fixtures/**/__pycache__/
-   tests/fixtures/**/.pytest_cache/
-   ```
-
-**Test:** Run the full test suite and confirm it still passes. No new test needed beyond
-confirming the fixture scans produce clean results.
-
----
-
-### P1-5 — `LINT_FILE_NAMES` misses ESLint v9 and other common linters
-
-**File:** `src/reposage/analysis/quality.py`
-
-Replace the `LINT_FILE_NAMES` set with:
-
-```python
-LINT_FILE_NAMES = {
-    ".eslintrc",
-    ".eslintrc.json",
-    ".eslintrc.js",
-    ".eslintrc.cjs",
-    ".eslintrc.yaml",
-    ".eslintrc.yml",
-    "eslint.config.js",
-    "eslint.config.mjs",
-    "eslint.config.cjs",
-    ".ruff.toml",
-    "ruff.toml",
-    ".flake8",
-    ".pylintrc",
-    "biome.json",
-}
-```
-
-**Test:** Add a test to `tests/test_quality.py` that calls `score_quality_signals` (or
-`build_audit_report`) against a fixture repo that contains `eslint.config.mjs` and asserts
-`lint_present` is `True`. You may add the file to the existing `js_repo` fixture or create
-an inline file list using the analysis functions directly.
-
----
-
-### P1-7 — `scan/dependencies.py` test coverage at 72%
-
-**File:** `tests/test_dependencies.py`
-
-Add the following unit tests (all using `tmp_path` for file I/O where needed):
-
-- `test_parse_requirements_basic` — a `requirements.txt` with pinned and unpinned packages;
-  assert names and version specs are parsed correctly.
-- `test_parse_requirements_skips_comments_and_options` — lines starting with `#`, `-r`,
-  `-e`, `--hash`; assert none appear in the result.
-- `test_parse_pyproject_handles_decode_error` — write a file containing non-UTF-8 bytes
-  to `tmp_path / "pyproject.toml"`; assert the function returns an empty result without
-  raising.
-- `test_parse_package_json_handles_invalid_json` — write `{broken` to
-  `tmp_path / "package.json"`; assert the function returns an empty result without raising.
-- `test_parse_pyproject_poetry_groups` — a `pyproject.toml` with
-  `[tool.poetry.group.dev.dependencies]`; assert the dev dependency appears in the result.
-
-Target: ≥ 95% coverage on `scan/dependencies.py` after this commit.
-
----
-
-### P1-1 — `project-management.yml` is inert YAML; labels/milestones not created
-
-**Files:** `scripts/setup_github.sh`, `CONTRIBUTING.md`
-
-Create `scripts/setup_github.sh` — a shell script using the `gh` CLI to create all labels
-and milestones defined in `.github/project-management.yml`. The script must be idempotent
-(use `gh label create --force` so re-running does not error on existing labels).
-
-Update `CONTRIBUTING.md` to document that this script must be run once by a repo admin
-after the repository is created on GitHub.
-
-**Test:** No automated test. Manual verification step: `bash scripts/setup_github.sh`
-must exit 0 when `gh` is authenticated.
-
----
-
-### P2-1 — Delete `src/reposage/ai/` (M2 stub, 0% coverage)
-
-**Files:** `src/reposage/ai/__init__.py`, `src/reposage/ai/enrichment.py`,
-`src/reposage/ai/prompts.py`
-
-Delete the entire `src/reposage/ai/` package. It is M2 scope, has 0% coverage, and
-adds nothing. It will be restored when M2 work begins.
-
-Verify no other file imports from `reposage.ai`. Run the full test suite.
-
-**Test:** Full test suite passing is sufficient.
-
----
-
-### P2-2 — Remove `sys.path` hack from `tests/conftest.py`
-
-**File:** `tests/conftest.py`
-
-Remove the lines that manually insert `src/` into `sys.path`. The package is installed
-into the test environment by tox (`package = wheel`), so the hack is unnecessary and
-signals the code was tested outside of tox.
-
-Verify `tox -e py312` still passes after the removal.
-
-**Test:** `tox -e py312` passing is the acceptance criterion.
-
----
-
-### P2-4 — Placeholder `Homepage` URL in `pyproject.toml`
-
-**File:** `pyproject.toml`
-
-Replace:
-```toml
-Homepage = "https://github.com/example/reposage"
-```
-with the actual repository URL. If the final URL is not yet known, use the org/repo slug
-that matches this repository's remote origin.
-
-**Test:** `tox -e pkg` (build check) passing is sufficient.
-
----
-
-### P2-5 — Magic number `25` in `analysis/risk.py` not in `ScanConfig`
-
-**Files:** `src/reposage/config.py`, `src/reposage/analysis/risk.py`
-
-Add to `ScanConfig`:
-```python
-dependency_count_risk_threshold: int = 25
-```
-
-Thread `config.dependency_count_risk_threshold` into `analyze_risk` (update its signature
-to accept `config: ScanConfig`) and replace the literal `25` with the config field.
-Update `pipeline.py` to pass config through.
-
-**Test:** Add a test asserting that a repo with more than 25 dependencies triggers the
-dependency-surface risk item.
-
----
-
-### P2-6 — No test for the `--output` CLI flag
-
-**File:** `tests/test_cli.py`
-
-Add a test using `tmp_path` that calls:
-```python
-main(["report", str(fixture_path("python_repo")), "--output", str(tmp_path / "out.md")])
-```
-Assert the output file was created and contains `## Project Summary`.
-
----
-
-### P2-7 — `analysis/risk.py` 18% branch gap (No CI, Dependency surface paths)
-
-**Files:** `tests/test_quality.py` and/or new fixture repos under `tests/fixtures/`
-
-Add coverage for lines 55–71 (No CI enforcement risk item) and lines 90–103 (Dependency
-surface area risk item) in `src/reposage/analysis/risk.py`.
-
-Options:
-- Add a `no_ci_repo` fixture directory with no `.github/` and no CI files, then assert
-  the "No CI enforcement" risk item appears.
-- Add a `heavy_deps_repo` fixture with a `requirements.txt` containing > 25 packages,
-  then assert the dependency-surface risk item appears.
-- Or drive both via `build_audit_report` in a parametrised test with inline fixture paths.
-
----
-
-### P2-3 — `scan` CLI subcommand is an undocumented alias for `report --format json`
-
-**File:** `src/reposage/cli.py`
-
-The `scan` subcommand and `report --format json` call the same function. Remove the `scan`
-subcommand entirely and update `README.md` to reflect that `report --format json` is the
-way to get JSON output. Update `tests/test_cli.py` to remove any tests that call `scan`
-and add or update tests for `report --format json` if missing.
-
----
-
-## 9. Gate Before Merge
-
-Before requesting review or merging:
+## 8. Gate Before Merge
 
 ```bash
-tox -e py312 && tox -e lint && tox -e type && tox -e pkg
+tox -e py312 && tox -e lint && tox -e type && tox -e pkg && tox -e linecount
 ```
 
-All four must be green. Coverage must be ≥ 90% on every non-stub module.
-`scan/dependencies.py` must be ≥ 95%.
+All five must be green. Coverage must be ≥ 90% on every non-stub module.
