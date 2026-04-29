@@ -7,6 +7,23 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-04-28
+
+### Added
+
+- Rust language support: Cargo.toml dependency parsing (normal / dev / build groups),
+  framework detection (Tokio, Axum, Actix-web, Rocket, Diesel, SQLx, Serde, Tonic),
+  quality signals, and 15 tests (M12).
+- C# / .NET language support: SDK-style `.csproj`, legacy `packages.config`, and
+  Central Package Management `Directory.Packages.props` parsing; NuGet ecosystem;
+  framework detection (ASP.NET Core, Blazor, Entity Framework Core, .NET MAUI, gRPC,
+  MassTransit, Hangfire, Dapper); static-typing signal; and 11 tests (M13).
+- `.editorconfig` recognized as a lint-config file.
+- `_dep_parsers_dotnet.py` module — splits NuGet parsers out of `_dep_parsers.py`
+  to stay under the 400-line per-file ceiling enforced by `tox -e linecount`.
+- `tox -e linecount` quality gate (`scripts/check_line_counts.py --max=400`).
+- Language extensions: `.cs` (C#), `.csx` (C# Script), `.fs` (F#), `.vb` (Visual Basic).
+
 ## [0.2.0] — 2026-04-17
 
 ### Added
