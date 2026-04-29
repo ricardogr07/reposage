@@ -14,8 +14,8 @@
 - Main modules: tests, src/reposage, .github, docs, terraform
 - Probable layers: application source, automated tests, documentation, automation, examples
 - Dependency directions: tests likely depend on source modules, not the reverse, documentation appears separate from runtime code, automation configuration is isolated from product code
-- Possible god modules: examples/reposage-audit.json (660 lines), docs/plans/archive/m2-ai-enrichment.md (482 lines), docs/agents.md (435 lines), docs/plans/archive/m8-m11-roadmap.md (398 lines), docs/plans/archive/m12-m13-roadmap.md (368 lines)
-- Hotspots: examples/reposage-audit.json (19369 bytes, 660 lines), docs/plans/archive/m2-ai-enrichment.md (18776 bytes, 482 lines), docs/agents.md (15391 bytes, 435 lines), docs/plans/archive/m8-m11-roadmap.md (17828 bytes, 398 lines), docs/plans/archive/m12-m13-roadmap.md (14874 bytes, 368 lines)
+- Possible god modules: examples/reposage-audit.json (660 lines), docs/plans/archive/m2-ai-enrichment.md (482 lines), docs/plans/archive/m8-m11-roadmap.md (398 lines), docs/plans/archive/m12-m13-roadmap.md (368 lines), src/reposage/scan/_dep_parsers.py (358 lines)
+- Hotspots: examples/reposage-audit.json (19445 bytes, 660 lines), docs/plans/archive/m2-ai-enrichment.md (18776 bytes, 482 lines), docs/plans/archive/m8-m11-roadmap.md (17828 bytes, 398 lines), docs/plans/archive/m12-m13-roadmap.md (14874 bytes, 368 lines), src/reposage/scan/_dep_parsers.py (10852 bytes, 358 lines)
 - Notes: Multiple manifest roots detected; monorepo behavior is likely., Source code appears separated from tests/docs via a src-style layout.
 
 ## Engineering Quality Checklist

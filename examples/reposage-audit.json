@@ -11,18 +11,18 @@
       "automation configuration is isolated from product code"
     ],
     "god_modules": [
+      "examples/reposage-audit.json (660 lines)",
       "docs/plans/archive/m2-ai-enrichment.md (482 lines)",
-      "examples/reposage-audit.json (447 lines)",
-      "docs/agents.md (435 lines)",
       "docs/plans/archive/m8-m11-roadmap.md (398 lines)",
-      "docs/plans/archive/m12-m13-roadmap.md (368 lines)"
+      "docs/plans/archive/m12-m13-roadmap.md (368 lines)",
+      "src/reposage/scan/_dep_parsers.py (358 lines)"
     ],
     "hotspots": [
+      "examples/reposage-audit.json (19369 bytes, 660 lines)",
       "docs/plans/archive/m2-ai-enrichment.md (18776 bytes, 482 lines)",
-      "examples/reposage-audit.json (12820 bytes, 447 lines)",
-      "docs/agents.md (15391 bytes, 435 lines)",
       "docs/plans/archive/m8-m11-roadmap.md (17828 bytes, 398 lines)",
-      "docs/plans/archive/m12-m13-roadmap.md (14874 bytes, 368 lines)"
+      "docs/plans/archive/m12-m13-roadmap.md (14874 bytes, 368 lines)",
+      "src/reposage/scan/_dep_parsers.py (10852 bytes, 358 lines)"
     ],
     "main_modules": [
       "tests",
@@ -438,12 +438,12 @@
       {
         "file_count": 26,
         "language": "Markdown",
-        "total_bytes": 119768
+        "total_bytes": 114688
       },
       {
         "file_count": 13,
         "language": "JSON",
-        "total_bytes": 20902
+        "total_bytes": 27451
       },
       {
         "file_count": 13,
@@ -489,7 +489,7 @@
     "largest_files": [
       {
         "extension": null,
-        "line_count": 76,
+        "line_count": 72,
         "path": ".coverage",
         "size_bytes": 53248
       },
@@ -498,6 +498,12 @@
         "line_count": 209,
         "path": "examples/reposage-audit-enriched.md",
         "size_bytes": 20013
+      },
+      {
+        "extension": ".json",
+        "line_count": 660,
+        "path": "examples/reposage-audit.json",
+        "size_bytes": 19369
       },
       {
         "extension": ".md",
@@ -510,12 +516,6 @@
         "line_count": 398,
         "path": "docs/plans/archive/m8-m11-roadmap.md",
         "size_bytes": 17828
-      },
-      {
-        "extension": ".md",
-        "line_count": 435,
-        "path": "docs/agents.md",
-        "size_bytes": 15391
       }
     ],
     "project_name": "reposage",
@@ -640,9 +640,9 @@
       }
     ],
     "refactor_candidates": [
+      "examples/reposage-audit.json (660 lines)",
       "docs/plans/archive/m2-ai-enrichment.md (482 lines)",
-      "examples/reposage-audit.json (447 lines)",
-      "docs/agents.md (435 lines)"
+      "docs/plans/archive/m8-m11-roadmap.md (398 lines)"
     ],
     "roadmap_buckets": [
       "Clarify architecture",
