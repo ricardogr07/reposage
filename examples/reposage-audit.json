@@ -1,4 +1,5 @@
 {
+  "api_surface": null,
   "architecture": {
     "architecture_notes": [
       "Multiple manifest roots detected; monorepo behavior is likely.",
@@ -10,25 +11,25 @@
       "automation configuration is isolated from product code"
     ],
     "god_modules": [
-      "examples/reposage-audit.json (668 lines)",
-      "docs/plans/m2-ai-enrichment.md (482 lines)",
+      "docs/plans/archive/m2-ai-enrichment.md (482 lines)",
+      "examples/reposage-audit.json (447 lines)",
       "docs/agents.md (435 lines)",
-      "src/reposage/scan/dependencies.py (293 lines)",
-      "tests/test_dependencies.py (216 lines)"
+      "docs/plans/archive/m8-m11-roadmap.md (398 lines)",
+      "docs/plans/archive/m12-m13-roadmap.md (368 lines)"
     ],
     "hotspots": [
-      "examples/reposage-audit.json (22352 bytes, 668 lines)",
-      "docs/plans/m2-ai-enrichment.md (18776 bytes, 482 lines)",
+      "docs/plans/archive/m2-ai-enrichment.md (18776 bytes, 482 lines)",
+      "examples/reposage-audit.json (12820 bytes, 447 lines)",
       "docs/agents.md (15391 bytes, 435 lines)",
-      "src/reposage/scan/dependencies.py (8675 bytes, 293 lines)",
-      "tests/test_dependencies.py (6889 bytes, 216 lines)"
+      "docs/plans/archive/m8-m11-roadmap.md (17828 bytes, 398 lines)",
+      "docs/plans/archive/m12-m13-roadmap.md (14874 bytes, 368 lines)"
     ],
     "main_modules": [
       "tests",
       "src/reposage",
       ".github",
-      "terraform",
-      "docs"
+      "docs",
+      "terraform"
     ],
     "probable_layers": [
       "application source",
@@ -40,10 +41,48 @@
   },
   "dependencies": {
     "counts_by_ecosystem": {
-      "npm": 6,
-      "python": 19
+      "cargo": 6,
+      "maven": 6,
+      "npm": 9,
+      "nuget": 5,
+      "python": 20
     },
     "dependencies": [
+      {
+        "ecosystem": "npm",
+        "group": "dependencies",
+        "name": "@angular/core",
+        "source_file": "tests/fixtures/ts_repo/package.json",
+        "version_spec": "^17.0.0"
+      },
+      {
+        "ecosystem": "nuget",
+        "group": "runtime",
+        "name": "Dapper",
+        "source_file": "tests/fixtures/csharp_repo/src/MyApp/MyApp.csproj",
+        "version_spec": "2.1.28"
+      },
+      {
+        "ecosystem": "nuget",
+        "group": "runtime",
+        "name": "Microsoft.AspNetCore.OpenApi",
+        "source_file": "tests/fixtures/csharp_repo/src/MyApp/MyApp.csproj",
+        "version_spec": "8.0.0"
+      },
+      {
+        "ecosystem": "nuget",
+        "group": "runtime",
+        "name": "Microsoft.EntityFrameworkCore",
+        "source_file": "tests/fixtures/csharp_repo/src/MyApp/MyApp.csproj",
+        "version_spec": "8.0.0"
+      },
+      {
+        "ecosystem": "nuget",
+        "group": "runtime",
+        "name": "Microsoft.NET.Test.Sdk",
+        "source_file": "tests/fixtures/csharp_repo/src/MyApp.Tests/MyApp.Tests.csproj",
+        "version_spec": "17.11.0"
+      },
       {
         "ecosystem": "python",
         "group": "ai",
@@ -52,11 +91,25 @@
         "version_spec": ">=0.40"
       },
       {
+        "ecosystem": "cargo",
+        "group": "runtime",
+        "name": "axum",
+        "source_file": "tests/fixtures/rust_repo/Cargo.toml",
+        "version_spec": "0.7"
+      },
+      {
         "ecosystem": "python",
         "group": "dev",
         "name": "build",
         "source_file": "pyproject.toml",
         "version_spec": ">=1.2"
+      },
+      {
+        "ecosystem": "cargo",
+        "group": "build",
+        "name": "cc",
+        "source_file": "tests/fixtures/rust_repo/Cargo.toml",
+        "version_spec": "1.0"
       },
       {
         "ecosystem": "npm",
@@ -85,6 +138,48 @@
         "name": "hatchling",
         "source_file": "pyproject.toml",
         "version_spec": ">=1.26"
+      },
+      {
+        "ecosystem": "python",
+        "group": "server",
+        "name": "httpx",
+        "source_file": "pyproject.toml",
+        "version_spec": ">=0.27"
+      },
+      {
+        "ecosystem": "maven",
+        "group": "runtime",
+        "name": "io.quarkus:quarkus-arc",
+        "source_file": "tests/fixtures/java_gradle_repo/build.gradle",
+        "version_spec": "3.6.0"
+      },
+      {
+        "ecosystem": "maven",
+        "group": "test",
+        "name": "io.quarkus:quarkus-junit5",
+        "source_file": "tests/fixtures/java_gradle_repo/build.gradle",
+        "version_spec": "3.6.0"
+      },
+      {
+        "ecosystem": "maven",
+        "group": "runtime",
+        "name": "io.quarkus:quarkus-resteasy",
+        "source_file": "tests/fixtures/java_gradle_repo/build.gradle",
+        "version_spec": "3.6.0"
+      },
+      {
+        "ecosystem": "maven",
+        "group": "test",
+        "name": "junit:junit",
+        "source_file": "tests/fixtures/java_maven_repo/pom.xml",
+        "version_spec": "4.13.2"
+      },
+      {
+        "ecosystem": "npm",
+        "group": "dependencies",
+        "name": "lodash",
+        "source_file": "tests/fixtures/ts_repo/package.json",
+        "version_spec": "^4.17.21"
       },
       {
         "ecosystem": "python",
@@ -120,6 +215,20 @@
         "name": "openai",
         "source_file": "pyproject.toml",
         "version_spec": ">=1.0"
+      },
+      {
+        "ecosystem": "maven",
+        "group": "runtime",
+        "name": "org.springframework.boot:spring-boot-starter-data-jpa",
+        "source_file": "tests/fixtures/java_maven_repo/pom.xml",
+        "version_spec": "3.2.0"
+      },
+      {
+        "ecosystem": "maven",
+        "group": "runtime",
+        "name": "org.springframework.boot:spring-boot-starter-web",
+        "source_file": "tests/fixtures/java_maven_repo/pom.xml",
+        "version_spec": "3.2.0"
       },
       {
         "ecosystem": "python",
@@ -192,11 +301,46 @@
         "version_spec": ">=0.11"
       },
       {
+        "ecosystem": "cargo",
+        "group": "runtime",
+        "name": "serde",
+        "source_file": "tests/fixtures/rust_repo/Cargo.toml",
+        "version_spec": "1"
+      },
+      {
+        "ecosystem": "cargo",
+        "group": "runtime",
+        "name": "sqlx",
+        "source_file": "tests/fixtures/rust_repo/Cargo.toml",
+        "version_spec": "*"
+      },
+      {
+        "ecosystem": "cargo",
+        "group": "runtime",
+        "name": "tokio",
+        "source_file": "tests/fixtures/rust_repo/Cargo.toml",
+        "version_spec": "1"
+      },
+      {
+        "ecosystem": "cargo",
+        "group": "dev",
+        "name": "tokio-test",
+        "source_file": "tests/fixtures/rust_repo/Cargo.toml",
+        "version_spec": "0.4"
+      },
+      {
         "ecosystem": "python",
         "group": "dev",
         "name": "tox",
         "source_file": "pyproject.toml",
         "version_spec": ">=4.27"
+      },
+      {
+        "ecosystem": "npm",
+        "group": "devDependencies",
+        "name": "typescript",
+        "source_file": "tests/fixtures/ts_repo/package.json",
+        "version_spec": "^5.0.0"
       },
       {
         "ecosystem": "npm",
@@ -218,37 +362,68 @@
         "name": "vitest",
         "source_file": "tests/fixtures/mixed_repo/package.json",
         "version_spec": "^2.1.0"
+      },
+      {
+        "ecosystem": "nuget",
+        "group": "runtime",
+        "name": "xunit",
+        "source_file": "tests/fixtures/csharp_repo/src/MyApp.Tests/MyApp.Tests.csproj",
+        "version_spec": "2.9.0"
       }
     ],
     "ecosystems": [
+      "cargo",
+      "maven",
       "npm",
+      "nuget",
       "python"
     ],
     "manifests": [
       "pyproject.toml",
+      "tests/fixtures/api_repo/pyproject.toml",
+      "tests/fixtures/csharp_repo/src/MyApp.Tests/MyApp.Tests.csproj",
+      "tests/fixtures/csharp_repo/src/MyApp/MyApp.csproj",
+      "tests/fixtures/java_gradle_repo/build.gradle",
+      "tests/fixtures/java_maven_repo/pom.xml",
       "tests/fixtures/js_repo/package.json",
       "tests/fixtures/mixed_repo/package.json",
       "tests/fixtures/mixed_repo/pyproject.toml",
       "tests/fixtures/monorepo_repo/packages/api/package.json",
       "tests/fixtures/monorepo_repo/packages/lib/pyproject.toml",
-      "tests/fixtures/python_repo/pyproject.toml"
+      "tests/fixtures/python_repo/pyproject.toml",
+      "tests/fixtures/rust_repo/Cargo.toml",
+      "tests/fixtures/ts_repo/package.json"
     ]
   },
   "inventory": {
     "frameworks": [
+      "ASP.NET Core",
+      "Angular",
+      "Axum",
+      "Dapper",
+      "Entity Framework Core",
       "Express",
       "FastAPI",
       "Next.js",
-      "React"
+      "Quarkus",
+      "React",
+      "SQLx",
+      "Spring Boot"
     ],
     "ignored_directories": [
       ".git",
+      ".mypy_cache",
+      ".ruff_cache",
+      ".tox",
       "src/reposage/__pycache__",
       "src/reposage/analysis/__pycache__",
+      "src/reposage/api/__pycache__",
       "src/reposage/enrichment/__pycache__",
       "src/reposage/reports/__pycache__",
       "src/reposage/scan/__pycache__",
+      "src/reposage/security/__pycache__",
       "src/reposage/server/__pycache__",
+      "tests/__pycache__",
       "tests/fixtures/mixed_repo/.ruff_cache",
       "tests/fixtures/mixed_repo/tests/__pycache__",
       "tests/fixtures/python_repo/.ruff_cache",
@@ -256,19 +431,19 @@
     ],
     "languages": [
       {
-        "file_count": 52,
+        "file_count": 81,
         "language": "Python",
-        "total_bytes": 112343
+        "total_bytes": 213062
       },
       {
-        "file_count": 20,
+        "file_count": 26,
         "language": "Markdown",
-        "total_bytes": 85765
+        "total_bytes": 119768
       },
       {
-        "file_count": 6,
+        "file_count": 13,
         "language": "JSON",
-        "total_bytes": 24821
+        "total_bytes": 20902
       },
       {
         "file_count": 13,
@@ -276,14 +451,34 @@
         "total_bytes": 9953
       },
       {
-        "file_count": 4,
+        "file_count": 6,
         "language": "TOML",
-        "total_bytes": 3349
+        "total_bytes": 3885
       },
       {
         "file_count": 1,
         "language": "Docker",
         "total_bytes": 891
+      },
+      {
+        "file_count": 2,
+        "language": "TypeScript",
+        "total_bytes": 574
+      },
+      {
+        "file_count": 3,
+        "language": "Java",
+        "total_bytes": 413
+      },
+      {
+        "file_count": 3,
+        "language": "Rust",
+        "total_bytes": 354
+      },
+      {
+        "file_count": 2,
+        "language": "C#",
+        "total_bytes": 158
       },
       {
         "file_count": 2,
@@ -293,10 +488,10 @@
     ],
     "largest_files": [
       {
-        "extension": ".json",
-        "line_count": 668,
-        "path": "examples/reposage-audit.json",
-        "size_bytes": 22352
+        "extension": null,
+        "line_count": 76,
+        "path": ".coverage",
+        "size_bytes": 53248
       },
       {
         "extension": ".md",
@@ -307,27 +502,28 @@
       {
         "extension": ".md",
         "line_count": 482,
-        "path": "docs/plans/m2-ai-enrichment.md",
+        "path": "docs/plans/archive/m2-ai-enrichment.md",
         "size_bytes": 18776
+      },
+      {
+        "extension": ".md",
+        "line_count": 398,
+        "path": "docs/plans/archive/m8-m11-roadmap.md",
+        "size_bytes": 17828
       },
       {
         "extension": ".md",
         "line_count": 435,
         "path": "docs/agents.md",
         "size_bytes": 15391
-      },
-      {
-        "extension": ".md",
-        "line_count": 193,
-        "path": "docs/architecture.md",
-        "size_bytes": 8690
       }
     ],
     "project_name": "reposage",
     "root_path": "C:\\git\\reposage",
-    "scanned_files": 111,
+    "scanned_files": 175,
     "top_level_entries": [
       ".claude",
+      ".coverage",
       ".env",
       ".github",
       ".gitignore",
@@ -370,47 +566,57 @@
       "docs/agents.md",
       "docs/architecture.md",
       "docs/development.md",
-      "docs/plans/m1-foundation.md",
-      "docs/plans/m2-ai-enrichment.md",
+      "docs/plans/archive/m1-foundation.md",
+      "docs/plans/archive/m12-m13-roadmap.md",
+      "docs/plans/archive/m2-ai-enrichment.md",
+      "docs/plans/archive/m8-m11-roadmap.md",
       "examples/README.md",
+      "tests/fixtures/api_repo/README.md",
+      "tests/fixtures/java_gradle_repo/README.md",
+      "tests/fixtures/java_maven_repo/README.md",
       "tests/fixtures/js_repo/README.md",
       "tests/fixtures/mixed_repo/README.md",
       "tests/fixtures/monorepo_repo/README.md",
-      "tests/fixtures/python_repo/README.md"
+      "tests/fixtures/python_repo/README.md",
+      "tests/fixtures/ts_repo/README.md"
     ],
     "documentation_present": true,
     "has_tests": true,
     "lint_files": [
-      "pyproject.toml"
+      "pyproject.toml",
+      "tests/fixtures/java_maven_repo/checkstyle.xml"
     ],
     "lint_present": true,
     "missing_signals": [],
     "packaging_files": [
       "pyproject.toml",
+      "tests/fixtures/api_repo/pyproject.toml",
       "tests/fixtures/js_repo/package.json",
       "tests/fixtures/mixed_repo/package.json",
       "tests/fixtures/mixed_repo/pyproject.toml",
       "tests/fixtures/monorepo_repo/packages/api/package.json",
       "tests/fixtures/monorepo_repo/packages/lib/pyproject.toml",
-      "tests/fixtures/python_repo/pyproject.toml"
+      "tests/fixtures/python_repo/pyproject.toml",
+      "tests/fixtures/ts_repo/package.json"
     ],
     "packaging_present": true,
     "score": 100,
     "test_files": [
       "tests/__init__.py",
       "tests/conftest.py",
-      "tests/fixtures/js_repo/src/index.tsx",
-      "tests/fixtures/missing_signals_repo/src/legacy.py",
-      "tests/fixtures/mixed_repo/src/app/main.py",
-      "tests/fixtures/mixed_repo/tests/test_main.py",
-      "tests/fixtures/mixed_repo/web/src/index.tsx",
-      "tests/fixtures/monorepo_repo/packages/lib/src/lib_pkg/__init__.py",
-      "tests/fixtures/python_repo/src/example_pkg/__init__.py",
-      "tests/fixtures/python_repo/src/example_pkg/service.py"
+      "tests/fixtures/api_repo/src/mylib/__init__.py",
+      "tests/fixtures/api_repo/src/mylib/core.py",
+      "tests/fixtures/api_repo/src/mylib/utils.py",
+      "tests/fixtures/csharp_repo/src/MyApp.Tests/ProgramTests.cs",
+      "tests/fixtures/csharp_repo/src/MyApp/Program.cs",
+      "tests/fixtures/java_gradle_repo/src/main/java/App.java",
+      "tests/fixtures/java_maven_repo/src/main/java/App.java",
+      "tests/fixtures/java_maven_repo/src/test/java/AppTest.java"
     ],
     "typing_files": [
       "pyproject.toml",
-      "src/reposage/py.typed"
+      "src/reposage/py.typed",
+      "tests/fixtures/ts_repo/tsconfig.json"
     ],
     "typing_present": true
   },
@@ -434,8 +640,8 @@
       }
     ],
     "refactor_candidates": [
-      "examples/reposage-audit.json (668 lines)",
-      "docs/plans/m2-ai-enrichment.md (482 lines)",
+      "docs/plans/archive/m2-ai-enrichment.md (482 lines)",
+      "examples/reposage-audit.json (447 lines)",
       "docs/agents.md (435 lines)"
     ],
     "roadmap_buckets": [
@@ -443,5 +649,12 @@
       "Manage dependencies"
     ],
     "weak_points": []
-  }
+  },
+  "security": null,
+  "ts_analysis": {
+    "any_usage_count": 5,
+    "type_assertion_count": 1,
+    "untyped_exports": 2
+  },
+  "ts_config": null
 }

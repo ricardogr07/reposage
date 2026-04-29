@@ -2,32 +2,32 @@
 
 ## Project Summary
 - Root path: `C:\git\reposage`
-- Scanned files: 166
-- Ignored directories: .claude/worktrees/jolly-wozniak/tests/__pycache__, .git, .mypy_cache, .ruff_cache, .tmp/pytest-of-unknown/pytest-0/test_scan_repository_ignores_c0/node_modules, .tox, dist, src/reposage/__pycache__, src/reposage/analysis/__pycache__, src/reposage/enrichment/__pycache__, src/reposage/reports/__pycache__, src/reposage/scan/__pycache__, tests/__pycache__, tests/fixtures/mixed_repo/.ruff_cache, tests/fixtures/mixed_repo/tests/__pycache__, tests/fixtures/python_repo/.ruff_cache, tests/fixtures/python_repo/tests/__pycache__
-- Top-level layout: .claude, .coverage, .env, .github, .gitignore, .tmp, AGENTS.md, CHANGELOG.md, CONTRIBUTING.md, LICENSE, M2_PLAN.md, PLAN.md, README.md, docs, examples, pyproject.toml, src/reposage, tests, tox.ini
-- Languages: Python (75), Markdown (37), TOML (10), JSON (10), YAML (11), Text (4), React TSX (4), JavaScript (2)
-- Framework signals: Express, FastAPI, Flask, Next.js, React
-- Dependency ecosystems: npm, python
-- Dependency manifests: .claude/worktrees/jolly-wozniak/pyproject.toml, .claude/worktrees/jolly-wozniak/tests/fixtures/js_repo/package.json, .claude/worktrees/jolly-wozniak/tests/fixtures/mixed_repo/package.json, .claude/worktrees/jolly-wozniak/tests/fixtures/mixed_repo/pyproject.toml, .claude/worktrees/jolly-wozniak/tests/fixtures/monorepo_repo/packages/api/package.json, .claude/worktrees/jolly-wozniak/tests/fixtures/monorepo_repo/packages/lib/pyproject.toml, .claude/worktrees/jolly-wozniak/tests/fixtures/python_repo/pyproject.toml, .tmp/pytest-of-unknown/pytest-0/test_dependency_surface_risk_u0/requirements.txt, .tmp/pytest-of-unknown/pytest-0/test_parse_package_json_return0/package.json, .tmp/pytest-of-unknown/pytest-0/test_parse_pyproject_collects_0/pyproject.toml, .tmp/pytest-of-unknown/pytest-0/test_parse_pyproject_returns_e0/pyproject.toml, .tmp/pytest-of-unknown/pytest-0/test_parse_requirements_skips_0/requirements.txt, .tmp/pytest-of-unknown/pytest-0/test_summarize_dependencies_di0/requirements-dev.txt, pyproject.toml, tests/fixtures/js_repo/package.json, tests/fixtures/mixed_repo/package.json, tests/fixtures/mixed_repo/pyproject.toml, tests/fixtures/monorepo_repo/packages/api/package.json, tests/fixtures/monorepo_repo/packages/lib/pyproject.toml, tests/fixtures/python_repo/pyproject.toml
+- Scanned files: 175
+- Ignored directories: .git, .mypy_cache, .ruff_cache, .tox, src/reposage/__pycache__, src/reposage/analysis/__pycache__, src/reposage/api/__pycache__, src/reposage/enrichment/__pycache__, src/reposage/reports/__pycache__, src/reposage/scan/__pycache__, src/reposage/security/__pycache__, src/reposage/server/__pycache__, tests/__pycache__, tests/fixtures/mixed_repo/.ruff_cache, tests/fixtures/mixed_repo/tests/__pycache__, tests/fixtures/python_repo/.ruff_cache, tests/fixtures/python_repo/tests/__pycache__
+- Top-level layout: .claude, .coverage, .env, .github, .gitignore, .pre-commit-config.yaml, CHANGELOG.md, CONTRIBUTING.md, Dockerfile, LICENSE, README.md, action.yml, docs, examples, k8s, pyproject.toml, scripts, src/reposage, terraform, tests, tox.ini
+- Languages: Python (81), Markdown (26), JSON (13), YAML (13), TOML (6), Docker (1), TypeScript (2), Java (3), Rust (3), C# (2), React TSX (2)
+- Framework signals: ASP.NET Core, Angular, Axum, Dapper, Entity Framework Core, Express, FastAPI, Next.js, Quarkus, React, SQLx, Spring Boot
+- Dependency ecosystems: cargo, maven, npm, nuget, python
+- Dependency manifests: pyproject.toml, tests/fixtures/api_repo/pyproject.toml, tests/fixtures/csharp_repo/src/MyApp.Tests/MyApp.Tests.csproj, tests/fixtures/csharp_repo/src/MyApp/MyApp.csproj, tests/fixtures/java_gradle_repo/build.gradle, tests/fixtures/java_maven_repo/pom.xml, tests/fixtures/js_repo/package.json, tests/fixtures/mixed_repo/package.json, tests/fixtures/mixed_repo/pyproject.toml, tests/fixtures/monorepo_repo/packages/api/package.json, tests/fixtures/monorepo_repo/packages/lib/pyproject.toml, tests/fixtures/python_repo/pyproject.toml, tests/fixtures/rust_repo/Cargo.toml, tests/fixtures/ts_repo/package.json
 
 ## Architecture Guess
-- Main modules: .claude, tests, src/reposage, .tmp, .github
+- Main modules: tests, src/reposage, .github, docs, terraform
 - Probable layers: application source, automated tests, documentation, automation, examples
 - Dependency directions: tests likely depend on source modules, not the reverse, documentation appears separate from runtime code, automation configuration is isolated from product code
-- Possible god modules: .claude/worktrees/jolly-wozniak/PLAN_FIX.md (498 lines), M2_PLAN.md (482 lines), .claude/worktrees/jolly-wozniak/AGENTS.md (435 lines), AGENTS.md (435 lines), tests/test_enrichment.py (406 lines)
-- Hotspots: .claude/worktrees/jolly-wozniak/PLAN_FIX.md (21778 bytes, 498 lines), M2_PLAN.md (18776 bytes, 482 lines), .claude/worktrees/jolly-wozniak/AGENTS.md (15391 bytes, 435 lines), AGENTS.md (15391 bytes, 435 lines), tests/test_enrichment.py (14069 bytes, 406 lines)
+- Possible god modules: examples/reposage-audit.json (660 lines), docs/plans/archive/m2-ai-enrichment.md (482 lines), docs/agents.md (435 lines), docs/plans/archive/m8-m11-roadmap.md (398 lines), docs/plans/archive/m12-m13-roadmap.md (368 lines)
+- Hotspots: examples/reposage-audit.json (19369 bytes, 660 lines), docs/plans/archive/m2-ai-enrichment.md (18776 bytes, 482 lines), docs/agents.md (15391 bytes, 435 lines), docs/plans/archive/m8-m11-roadmap.md (17828 bytes, 398 lines), docs/plans/archive/m12-m13-roadmap.md (14874 bytes, 368 lines)
 - Notes: Multiple manifest roots detected; monorepo behavior is likely., Source code appears separated from tests/docs via a src-style layout.
 
 ## Engineering Quality Checklist
 - Quality score: 100/100
 - Positive signals: Automated tests detected., CI configuration detected., Repository documentation detected., Packaging metadata detected., Lint configuration detected., Typing configuration detected.
 - Missing signals: none
-- Test files: .claude/worktrees/jolly-wozniak/tests/__init__.py, .claude/worktrees/jolly-wozniak/tests/conftest.py, .claude/worktrees/jolly-wozniak/tests/fixtures/js_repo/src/index.tsx, .claude/worktrees/jolly-wozniak/tests/fixtures/missing_signals_repo/src/legacy.py, .claude/worktrees/jolly-wozniak/tests/fixtures/mixed_repo/src/app/main.py, .claude/worktrees/jolly-wozniak/tests/fixtures/mixed_repo/tests/test_main.py, .claude/worktrees/jolly-wozniak/tests/fixtures/mixed_repo/web/src/index.tsx, .claude/worktrees/jolly-wozniak/tests/fixtures/monorepo_repo/packages/lib/src/lib_pkg/__init__.py, .claude/worktrees/jolly-wozniak/tests/fixtures/python_repo/src/example_pkg/__init__.py, .claude/worktrees/jolly-wozniak/tests/fixtures/python_repo/src/example_pkg/service.py
-- CI files: .github/workflows/ci.yml, .github/workflows/release.yml
-- Docs files: .claude/worktrees/jolly-wozniak/README.md, .claude/worktrees/jolly-wozniak/examples/README.md, .claude/worktrees/jolly-wozniak/tests/fixtures/js_repo/README.md, .claude/worktrees/jolly-wozniak/tests/fixtures/mixed_repo/README.md, .claude/worktrees/jolly-wozniak/tests/fixtures/monorepo_repo/README.md, .claude/worktrees/jolly-wozniak/tests/fixtures/python_repo/README.md, README.md, docs/architecture.md, docs/development.md, examples/README.md, tests/fixtures/js_repo/README.md, tests/fixtures/mixed_repo/README.md, tests/fixtures/monorepo_repo/README.md, tests/fixtures/python_repo/README.md
-- Packaging files: .claude/worktrees/jolly-wozniak/pyproject.toml, .claude/worktrees/jolly-wozniak/tests/fixtures/js_repo/package.json, .claude/worktrees/jolly-wozniak/tests/fixtures/mixed_repo/package.json, .claude/worktrees/jolly-wozniak/tests/fixtures/mixed_repo/pyproject.toml, .claude/worktrees/jolly-wozniak/tests/fixtures/monorepo_repo/packages/api/package.json, .claude/worktrees/jolly-wozniak/tests/fixtures/monorepo_repo/packages/lib/pyproject.toml, .claude/worktrees/jolly-wozniak/tests/fixtures/python_repo/pyproject.toml, .tmp/pytest-of-unknown/pytest-0/test_parse_package_json_return0/package.json, .tmp/pytest-of-unknown/pytest-0/test_parse_pyproject_collects_0/pyproject.toml, .tmp/pytest-of-unknown/pytest-0/test_parse_pyproject_returns_e0/pyproject.toml, pyproject.toml, tests/fixtures/js_repo/package.json, tests/fixtures/mixed_repo/package.json, tests/fixtures/mixed_repo/pyproject.toml, tests/fixtures/monorepo_repo/packages/api/package.json, tests/fixtures/monorepo_repo/packages/lib/pyproject.toml, tests/fixtures/python_repo/pyproject.toml
-- Lint files: .tmp/pytest-of-unknown/pytest-0/test_eslint_v9_flat_config_fil0/eslint.config.js, .tmp/pytest-of-unknown/pytest-0/test_eslint_v9_flat_config_fil1/eslint.config.mjs, .tmp/pytest-of-unknown/pytest-0/test_eslint_v9_flat_config_fil2/eslint.config.cjs, pyproject.toml
-- Typing files: .claude/worktrees/jolly-wozniak/src/reposage/py.typed, pyproject.toml, src/reposage/py.typed
+- Test files: tests/__init__.py, tests/conftest.py, tests/fixtures/api_repo/src/mylib/__init__.py, tests/fixtures/api_repo/src/mylib/core.py, tests/fixtures/api_repo/src/mylib/utils.py, tests/fixtures/csharp_repo/src/MyApp.Tests/ProgramTests.cs, tests/fixtures/csharp_repo/src/MyApp/Program.cs, tests/fixtures/java_gradle_repo/src/main/java/App.java, tests/fixtures/java_maven_repo/src/main/java/App.java, tests/fixtures/java_maven_repo/src/test/java/AppTest.java
+- CI files: .github/workflows/ci.yml, .github/workflows/demo.yml, .github/workflows/deploy.yml, .github/workflows/release.yml
+- Docs files: README.md, docs/agents.md, docs/architecture.md, docs/development.md, docs/plans/archive/m1-foundation.md, docs/plans/archive/m12-m13-roadmap.md, docs/plans/archive/m2-ai-enrichment.md, docs/plans/archive/m8-m11-roadmap.md, examples/README.md, tests/fixtures/api_repo/README.md, tests/fixtures/java_gradle_repo/README.md, tests/fixtures/java_maven_repo/README.md, tests/fixtures/js_repo/README.md, tests/fixtures/mixed_repo/README.md, tests/fixtures/monorepo_repo/README.md, tests/fixtures/python_repo/README.md, tests/fixtures/ts_repo/README.md
+- Packaging files: pyproject.toml, tests/fixtures/api_repo/pyproject.toml, tests/fixtures/js_repo/package.json, tests/fixtures/mixed_repo/package.json, tests/fixtures/mixed_repo/pyproject.toml, tests/fixtures/monorepo_repo/packages/api/package.json, tests/fixtures/monorepo_repo/packages/lib/pyproject.toml, tests/fixtures/python_repo/pyproject.toml, tests/fixtures/ts_repo/package.json
+- Lint files: pyproject.toml, tests/fixtures/java_maven_repo/checkstyle.xml
+- Typing files: pyproject.toml, src/reposage/py.typed, tests/fixtures/ts_repo/tsconfig.json
 
 ## Risk Hotspots
 - [medium] Large modules detected: The largest files are large enough to become coordination and review hotspots.
@@ -40,18 +40,27 @@
 1. Audit and rationalize the dependency set.
 
 ## Dependency Summary
+- @angular/core ^17.0.0 [npm/dependencies] from tests/fixtures/ts_repo/package.json
+- Dapper 2.1.28 [nuget/runtime] from tests/fixtures/csharp_repo/src/MyApp/MyApp.csproj
+- Microsoft.AspNetCore.OpenApi 8.0.0 [nuget/runtime] from tests/fixtures/csharp_repo/src/MyApp/MyApp.csproj
+- Microsoft.EntityFrameworkCore 8.0.0 [nuget/runtime] from tests/fixtures/csharp_repo/src/MyApp/MyApp.csproj
+- Microsoft.NET.Test.Sdk 17.11.0 [nuget/runtime] from tests/fixtures/csharp_repo/src/MyApp.Tests/MyApp.Tests.csproj
 - anthropic >=0.40 [python/ai] from pyproject.toml
-- build >=1.2 [python/dev] from .claude/worktrees/jolly-wozniak/pyproject.toml
+- axum 0.7 [cargo/runtime] from tests/fixtures/rust_repo/Cargo.toml
 - build >=1.2 [python/dev] from pyproject.toml
-- express ^5.0.0 [npm/dependencies] from .claude/worktrees/jolly-wozniak/tests/fixtures/monorepo_repo/packages/api/package.json
+- cc 1.0 [cargo/build] from tests/fixtures/rust_repo/Cargo.toml
 - express ^5.0.0 [npm/dependencies] from tests/fixtures/monorepo_repo/packages/api/package.json
-- fastapi >=0.115 [python/runtime] from .claude/worktrees/jolly-wozniak/tests/fixtures/mixed_repo/pyproject.toml
-- fastapi >=0.115 [python/runtime] from .claude/worktrees/jolly-wozniak/tests/fixtures/python_repo/pyproject.toml
 - fastapi >=0.115 [python/runtime] from tests/fixtures/mixed_repo/pyproject.toml
 - fastapi >=0.115 [python/runtime] from tests/fixtures/python_repo/pyproject.toml
-- flask >=3.0 [python/requirements] from .tmp/pytest-of-unknown/pytest-0/test_dependency_surface_risk_u0/requirements.txt
-- flask >=3.0 [python/requirements] from .tmp/pytest-of-unknown/pytest-0/test_parse_requirements_skips_0/requirements.txt
-- hatchling >=1.26 [python/dev] from .claude/worktrees/jolly-wozniak/pyproject.toml
 - hatchling >=1.26 [python/dev] from pyproject.toml
-- mkdocs * [python/docs] from .tmp/pytest-of-unknown/pytest-0/test_parse_pyproject_collects_0/pyproject.toml
-- mypy >=1.11 [python/dev] from .claude/worktrees/jolly-wozniak/pyproject.toml
+- httpx >=0.27 [python/server] from pyproject.toml
+- io.quarkus:quarkus-arc 3.6.0 [maven/runtime] from tests/fixtures/java_gradle_repo/build.gradle
+
+## TypeScript
+
+_No tsconfig.json found._
+
+**Code signals:**
+- `any` usage count: 5
+- Untyped exports: 2
+- Non-any type assertions: 1
