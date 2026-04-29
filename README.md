@@ -57,7 +57,7 @@ Add RepoSage to any workflow to audit your repository on every push:
   with:
     python-version: "3.12"
 
-- uses: ricardogr07/reposage@v0.2.0
+- uses: ricardogr07/reposage@v0.3.0
   with:
     path: .
     format: markdown
@@ -91,7 +91,7 @@ same `tox` commands.
 
 ## Project documents
 
-- [PLAN.md](docs/plans/m1-foundation.md): roadmap, issue backlog, PR strategy, and acceptance criteria
+- [Roadmap history](docs/plans/): milestone roadmap and acceptance criteria archives
 - [CHANGELOG.md](CHANGELOG.md): version history
 - [docs/architecture.md](docs/architecture.md): package and data-flow overview
 - [docs/development.md](docs/development.md): contributor workflow and quality gates
@@ -100,7 +100,6 @@ same `tox` commands.
 
 ## Status
 
-M0 (bootstrap), M1 (deterministic audit), and M2 (AI enrichment) are complete.
-M3 (productization) adds release automation, a GitHub Action wrapper, and
-examples. AI enrichment remains optional and is intentionally separated from the
-extraction layer.
+M0 (bootstrap), M1 (deterministic audit), M2 (AI enrichment), M12 (Rust support),
+and M13 (C# / .NET support) are complete. AI enrichment remains optional and is
+intentionally separated from the extraction layer.
