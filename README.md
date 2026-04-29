@@ -18,6 +18,17 @@ Markdown or JSON audit report.
 - Markdown and JSON output
 - Optional AI enrichment only after deterministic extraction
 
+## Supported languages
+
+| Language | Manifest / ecosystem | Framework signals |
+|---|---|---|
+| Python | `pyproject.toml`, `requirements*.txt` | FastAPI, Flask, Django, Celery, … |
+| JavaScript / TypeScript | `package.json` | React, Next.js, Express, Angular, Vue, … |
+| Java | `pom.xml` (Maven), `build.gradle` (Gradle) | Spring Boot, Quarkus, Micronaut, … |
+| Rust | `Cargo.toml` | Tokio, Axum, Actix-web, Rocket, Diesel, SQLx, Serde, … |
+| C# / .NET | `.csproj`, `packages.config`, `Directory.Packages.props` | ASP.NET Core, Blazor, EF Core, .NET MAUI, gRPC, … |
+| Ruby, Go, and others | quality and test signals only | — |
+
 ## Quick start
 
 ```bash
@@ -34,6 +45,14 @@ reposage report /path/to/repo --format json --output audit.json
 pip install 'reposage[ai]'
 ANTHROPIC_API_KEY=sk-ant-... reposage report /path/to/repo --enrich
 ```
+
+## How it works
+
+1. **Static extraction** — scans the filesystem, parses manifests, and applies heuristics.
+   No API calls, no network, no runtime dependencies.
+2. **Deterministic output** — the same repo always produces the same report.
+3. **Optional AI enrichment** — pass `--enrich` to add module roles, technical debt items,
+   and top-5 improvements via a single Anthropic or OpenAI API call.
 
 ## Commands
 
