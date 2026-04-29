@@ -17,8 +17,10 @@ src/reposage/
 ├── scan/
 │   ├── filesystem.py  — recursive file walk with stable ignore policy
 │   ├── languages.py   — language and framework signal detection
-│   ├── dependencies.py— manifest parsing (pyproject.toml, package.json, requirements.txt)
-│   └── repo_meta.py   — project name, VCS metadata
+│   ├── dependencies.py    — manifest detection and dispatch
+│   ├── _dep_parsers.py    — Python/JS/TS/Ruby/Go/Java/Rust manifest parsers
+│   ├── _dep_parsers_dotnet.py — NuGet parsers (.csproj, packages.config, Directory.Packages.props)
+│   └── repo_meta.py       — project name, VCS metadata
 ├── analysis/
 │   ├── architecture.py— main-module detection, layer guesses, god-module heuristics
 │   ├── quality.py     — engineering-quality checklist and score
@@ -123,20 +125,39 @@ EnrichmentResult
    `server` extra installs MCP and uvicorn. Neither extra is required for the CLI or
    the base audit pipeline.
 
+6. **400-line per-file ceiling** — no source file in `src/reposage/` may exceed 400 lines.
+   Enforced by `tox -e linecount` (`scripts/check_line_counts.py`). When a file approaches
+   the limit, split it by responsibility into a sibling module.
+
+---
+
+## Layer Boundaries
+
+| Layer | Modules | Allowed runtime dependencies |
+|---|---|---|
+| domain | `scan/`, `analysis/`, `models.py` | stdlib only |
+| application | `pipeline.py`, `cli.py` | domain |
+| presentation | `reports/` | domain, application |
+| enrichment | `enrichment/` | domain; `anthropic` / `openai` via lazy import |
+| infrastructure | `server/`, `api/`, `security/` | all layers; `mcp` / `uvicorn` via lazy import |
+
+The domain layer must never import from enrichment or infrastructure. This keeps the
+core audit pipeline runnable without any optional extras installed.
+
 ---
 
 ## Extension Points
 
-### Adding a new dependency scanner (e.g., Cargo, Go modules)
+### Adding a new dependency scanner (e.g., Go modules, Swift)
 
-1. Add a `_parse_<ecosystem>(path, relative_path)` function in
-   `src/reposage/scan/dependencies.py` returning `list[Dependency]`.
-2. Add the manifest filename constant at the top of the file (e.g., `_CARGO_TOML = "Cargo.toml"`).
-3. Extend `_is_supported_manifest()` to recognise the new filename.
-4. Add an `elif` branch in the dispatch block inside `summarize_dependencies()`.
+Cargo (M12) and NuGet (M13) are already implemented as examples of this pattern.
 
-> **Note:** When a fourth ecosystem is added, consider extracting the dispatch logic
-> into a registry dict `{filename: parser_fn}` to avoid a growing `if/elif` chain.
+1. If the new parsers will push `_dep_parsers.py` past 400 lines, create a sibling file
+   (e.g., `_dep_parsers_go.py`) and add parsers there.
+2. Add a `_parse_<ecosystem>(path, relative_path)` function returning `list[Dependency]`.
+3. Add the manifest filename constant in `dependencies.py` (e.g., `_GO_MOD = "go.mod"`).
+4. Extend `_is_supported_manifest()` to recognise the new filename.
+5. Add an `elif` branch in the dispatch block inside `summarize_dependencies()`.
 
 ### Adding a new enrichment provider (e.g., Google Gemini)
 
