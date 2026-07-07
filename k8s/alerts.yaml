@@ -1,0 +1,30 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: reposage-server
+  labels:
+    app: reposage-server
+    release: prometheus
+spec:
+  groups:
+    - name: reposage-server.rules
+      rules:
+        - alert: ReposageServerDown
+          # No requests counter has been reported for 5m: the server is not
+          # scraping, i.e. it is down or the exporter is broken.
+          expr: absent(reposage_requests_total)
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "RepoSage server is not reporting metrics"
+            description: "reposage_requests_total has been absent for 5 minutes."
+        - alert: ReposageServerHighLatency
+          # p95 tool latency over 10s across a 5m window.
+          expr: histogram_quantile(0.95, sum(rate(reposage_request_latency_ms_bucket[5m])) by (le)) > 10000
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "RepoSage tool latency is high"
+            description: "p95 reposage_request_latency_ms is above 10000ms for 10 minutes."

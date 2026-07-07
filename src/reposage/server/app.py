@@ -11,6 +11,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 
+from reposage.server.observability import observe
+
 if TYPE_CHECKING:
     from starlette.applications import Starlette
 
@@ -73,15 +75,16 @@ def create_mcp_app() -> Starlette:
             token: Optional personal access token (PAT) or GitHub App token for private
                    repositories. Falls back to the GITHUB_TOKEN environment variable.
         """
-        _validate_repo_url(repo_url)
-        effective_token = _resolve_token(token)
+        with observe("audit_repository"):
+            _validate_repo_url(repo_url)
+            effective_token = _resolve_token(token)
 
-        tmp = tempfile.mkdtemp(prefix="reposage-")
-        try:
-            _clone(repo_url, ref, tmp, token=effective_token)
-            return _audit(Path(tmp), enrich=enrich, enrich_provider=enrich_provider)
-        finally:
-            shutil.rmtree(tmp, ignore_errors=True)
+            tmp = tempfile.mkdtemp(prefix="reposage-")
+            try:
+                _clone(repo_url, ref, tmp, token=effective_token)
+                return _audit(Path(tmp), enrich=enrich, enrich_provider=enrich_provider)
+            finally:
+                shutil.rmtree(tmp, ignore_errors=True)
 
     app = mcp.streamable_http_app()
     app.routes.append(Route("/health", _health, methods=["GET"]))

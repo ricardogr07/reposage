@@ -17,6 +17,18 @@ from reposage.models import AuditReport
 from reposage.pipeline import build_audit_report
 
 
+@pytest.fixture(autouse=True)
+def _isolate_inner_audit_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Clear REPOSAGE_INNER_AUDIT so the s3 recursion guard cannot leak into tests.
+
+    When RepoSage audits its own repository it runs the suite in a subprocess
+    with REPOSAGE_INNER_AUDIT=1 set. Without this, the s3 unit tests that call
+    ``s3_proven.evaluate`` would see the guard fire and get UNCERTAIN instead of
+    the status they assert. Tests that need the guard set it explicitly.
+    """
+    monkeypatch.delenv("REPOSAGE_INNER_AUDIT", raising=False)
+
+
 def fixture_path(name: str) -> Path:
     """Return the path to a named test fixture repository."""
     project_root = Path(__file__).resolve().parents[1]
