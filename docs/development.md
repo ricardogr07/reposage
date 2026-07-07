@@ -18,6 +18,9 @@ tox -e lint
 tox -e type
 tox -e py312
 tox -e pkg
+tox -e linecount   # 400-line per-file ceiling
+tox -e selfaudit   # RepoSage grades its own repo (pinned at 6/6)
+tox -e docker      # build the server image and smoke-test the CLI
 ```
 
 ## Testing strategy

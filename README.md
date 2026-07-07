@@ -149,7 +149,7 @@ Add RepoSage to any workflow to audit your repository on every push:
   with:
     python-version: "3.12"
 
-- uses: ricardogr07/reposage@v0.3.0
+- uses: ricardogr07/reposage@v0.4.0
   with:
     path: .
     format: markdown
@@ -211,5 +211,8 @@ same `tox` commands.
 ## Status
 
 M0 (bootstrap), M1 (deterministic audit), M2 (AI enrichment), M12 (Rust support),
-and M13 (C# / .NET support) are complete. AI enrichment remains optional and is
-intentionally separated from the extraction layer.
+and M13 (C# / .NET support) are complete. v0.4.0 adds the Six Standards audit
+mode with DS/ML awareness, the `audit_standards` MCP tool, and the ds-audit
+composite action; the repository grades itself 6/6 in CI (`tox -e selfaudit`).
+AI enrichment remains optional and is intentionally separated from the
+extraction layer.

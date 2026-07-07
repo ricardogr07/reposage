@@ -7,6 +7,10 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.4.0] — 2026-07-07
+
 ### Added
 
 - Six Standards audit mode (`reposage audit PATH`): grades a repository 0-6
@@ -38,9 +42,15 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `ds-audit/action.yml`: a composite action tuned for DS/ML repositories
   (github-format annotations, `fail-under: 4` default, role-glob inputs).
 - `.env.example` documenting every environment variable RepoSage reads.
+- MCP server observability: OpenTelemetry request counter and latency
+  histogram plus request-id structured logging behind the optional
+  `observability` extra (no-op without it); Prometheus alert rules in
+  `k8s/alerts.yaml` reference the emitted metric names.
 
 ### Changed
 
+- The server Docker image installs frozen from the committed lockfile
+  (`uv sync --frozen`) instead of resolving dependencies at build time.
 - Anthropic enrichment default model is `claude-opus-4-8` (was
   `claude-haiku-4-5-20251001`); enrichment timeout raised to 60 s to match.
 - `s3.suite` reports UNCERTAIN instead of a 0-collected FAIL when pytest is
