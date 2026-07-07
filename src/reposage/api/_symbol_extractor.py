@@ -41,8 +41,9 @@ def _extract_from_file(path: Path, module: str, exported: set[str]) -> list[Publ
         return []
 
     symbols: list[PublicSymbol] = []
-    for node in tree.body:
-        sym = _node_to_symbol(node, module, exported)
+    for index, node in enumerate(tree.body):
+        following = tree.body[index + 1] if index + 1 < len(tree.body) else None
+        sym = _node_to_symbol(node, module, exported, following)
         if sym is not None:
             symbols.append(sym)
     return symbols
@@ -52,6 +53,7 @@ def _node_to_symbol(
     node: ast.stmt,
     module: str,
     exported: set[str],
+    following: ast.stmt | None = None,
 ) -> PublicSymbol | None:
     if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
         name = node.name
@@ -85,7 +87,8 @@ def _node_to_symbol(
             name=const_name,
             kind="constant",
             module=module,
-            has_docstring=False,
+            # PEP 224 attribute docstring: a string literal on the next line.
+            has_docstring=_is_string_expr(following),
             has_type_annotations=isinstance(node, ast.AnnAssign),
             exported_via_all=const_name in exported,
         )
@@ -95,11 +98,15 @@ def _node_to_symbol(
 def _has_docstring(body: list[ast.stmt]) -> bool:
     if not body:
         return False
-    first = body[0]
+    return _is_string_expr(body[0])
+
+
+def _is_string_expr(node: ast.stmt | None) -> bool:
     return (
-        isinstance(first, ast.Expr)
-        and isinstance(first.value, ast.Constant)
-        and isinstance(first.value.value, str)
+        node is not None
+        and isinstance(node, ast.Expr)
+        and isinstance(node.value, ast.Constant)
+        and isinstance(node.value.value, str)
     )
 
 

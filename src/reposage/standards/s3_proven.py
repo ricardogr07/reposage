@@ -21,6 +21,9 @@ from reposage.standards.models import (
 
 _INNER_AUDIT_ENV = "REPOSAGE_INNER_AUDIT"
 _COLLECTED_RE = re.compile(r"(\d+)\s+tests?\s+collected")
+# pytest 9's `-q --collect-only` prints per-file summaries ("tests/test_x.py: 3")
+# instead of node ids or a "collected" line.
+_COLLECT_FILE_RE = re.compile(r"^\S+\.py: (\d+)\s*$", re.MULTILINE)
 _METRIC_RE = re.compile(r"\b(auc|roc_auc|accuracy|precision|recall|f1|rmse|mae)\b", re.IGNORECASE)
 _THRESHOLD_RE = re.compile(r"(>=|>|floor|threshold|baseline)", re.IGNORECASE)
 _FAILURE_RE = re.compile(r"(sys\.exit|raise |assert )")
@@ -136,6 +139,9 @@ def _parse_collected(text: str) -> int:
     match = _COLLECTED_RE.search(text)
     if match:
         return int(match.group(1))
+    per_file = _COLLECT_FILE_RE.findall(text)
+    if per_file:
+        return sum(int(count) for count in per_file)
     return sum(1 for line in text.splitlines() if "::" in line)
 
 

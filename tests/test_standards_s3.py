@@ -67,6 +67,16 @@ def test_subprocess_failing_suite(tmp_path: Path) -> None:
     assert suite.status is CheckStatus.FAIL
 
 
+def test_parse_collected_handles_per_file_summary() -> None:
+    text = "tests/test_a.py: 3\ntests/test_b.py: 2\n\nwarnings summary\n"
+
+    assert s3_proven._parse_collected(text) == 5
+
+
+def test_parse_collected_prefers_collected_line() -> None:
+    assert s3_proven._parse_collected("11 tests collected in 0.5s") == 11
+
+
 def test_missing_pytest_is_uncertain(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     import subprocess
 

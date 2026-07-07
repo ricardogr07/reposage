@@ -101,6 +101,17 @@ def test_extract_public_symbols_missing_file(tmp_path: Path) -> None:
     assert result == []
 
 
+def test_constant_attribute_docstring_counts(tmp_path: Path) -> None:
+    source = 'FLOOR = 0.8\n"""The gate floor."""\n\nBARE = 1\nx = FLOOR\n'
+    (tmp_path / "consts.py").write_text(source, encoding="utf-8")
+    fr = FileRecord(path="consts.py", extension=".py", size_bytes=len(source), line_count=5)
+
+    by_name = {s.name: s for s in extract_public_symbols(tmp_path, [fr], {})}
+
+    assert by_name["FLOOR"].has_docstring is True
+    assert by_name["BARE"].has_docstring is False
+
+
 # ── _git_history ──────────────────────────────────────────────────────────────
 
 

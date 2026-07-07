@@ -9,6 +9,17 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Nothing yet.
 
+## [0.4.1] — 2026-07-07
+
+### Fixed
+
+- `s3.suite` parses pytest 9's per-file `--collect-only -q` summary
+  ("tests/test_x.py: 3"); collection no longer reads as zero tests on
+  repositories using current pytest.
+- Docstring coverage honors PEP 224 attribute docstrings, so a documented
+  module-level constant counts as documented. Both fixes were found by
+  auditing the production-ds-template repository.
+
 ## [0.4.0] — 2026-07-07
 
 ### Added
