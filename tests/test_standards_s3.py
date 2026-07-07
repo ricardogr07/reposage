@@ -67,6 +67,21 @@ def test_subprocess_failing_suite(tmp_path: Path) -> None:
     assert suite.status is CheckStatus.FAIL
 
 
+def test_missing_pytest_is_uncertain(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    import subprocess
+
+    _write(tmp_path, "tests/test_ok.py", "def test_ok():\n    assert 1 == 1\n")
+    fake = subprocess.CompletedProcess(
+        args=[], returncode=1, stdout="", stderr="/usr/bin/python: No module named pytest\n"
+    )
+    monkeypatch.setattr(s3_proven, "run", lambda *a, **k: fake)
+
+    suite = _check(_run(tmp_path, run_subprocess_checks=True), "s3.suite")
+
+    assert suite.status is CheckStatus.UNCERTAIN
+    assert "pytest is not installed" in suite.evidence[0]
+
+
 def test_inner_audit_guard_short_circuits(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("REPOSAGE_INNER_AUDIT", "1")
     _write(tmp_path, "tests/test_ok.py", "def test_ok():\n    assert 1 == 1\n")

@@ -94,7 +94,16 @@ def _run_suite(ctx: AuditContext, config: StandardsConfig) -> CheckResult:
             ["pytest collection timed out or pytest is unavailable"],
             "Ensure pytest is installed and the suite collects within the timeout.",
         )
-    count = _parse_collected(f"{collect.stdout}\n{collect.stderr}")
+    combined = f"{collect.stdout}\n{collect.stderr}"
+    if "No module named pytest" in combined:
+        return CheckResult(
+            cid,
+            name,
+            CheckStatus.UNCERTAIN,
+            ["pytest is not installed in the auditing environment"],
+            "Install pytest where the audit runs so the suite can be executed.",
+        )
+    count = _parse_collected(combined)
     if count == 0:
         return CheckResult(
             cid,

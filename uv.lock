@@ -1302,6 +1302,10 @@ ai = [
     { name = "anthropic" },
     { name = "openai" },
 ]
+audit = [
+    { name = "pytest" },
+    { name = "pytest-cov" },
+]
 dev = [
     { name = "build" },
     { name = "hatchling" },
@@ -1352,7 +1356,9 @@ requires-dist = [
     { name = "openai", marker = "extra == 'ai'", specifier = ">=1.0" },
     { name = "opentelemetry-exporter-otlp", marker = "extra == 'observability'", specifier = ">=1.25" },
     { name = "opentelemetry-sdk", marker = "extra == 'observability'", specifier = ">=1.25" },
+    { name = "pytest", marker = "extra == 'audit'", specifier = ">=8.3" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3" },
+    { name = "pytest-cov", marker = "extra == 'audit'", specifier = ">=6.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=6.0" },
     { name = "reposage", extras = ["observability"], marker = "extra == 'server'" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.11" },
@@ -1360,7 +1366,7 @@ requires-dist = [
     { name = "tox", marker = "extra == 'dev'", specifier = ">=4.27" },
     { name = "uvicorn", marker = "extra == 'server'", specifier = ">=0.30" },
 ]
-provides-extras = ["dev", "ai", "observability", "server"]
+provides-extras = ["dev", "ai", "observability", "audit", "server"]
 
 [package.metadata.requires-dev]
 ai = [

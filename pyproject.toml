@@ -44,6 +44,12 @@ observability = [
   "opentelemetry-sdk>=1.25",
   "opentelemetry-exporter-otlp>=1.25",
 ]
+# Lets the audit engine execute an audited repo's pytest suite
+# (run_subprocess_checks); the server image installs this extra.
+audit = [
+  "pytest>=8.3",
+  "pytest-cov>=6.0",
+]
 server = [
   "httpx>=0.27",
   "mcp[cli]>=1.0",

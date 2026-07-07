@@ -11,7 +11,7 @@ ENV UV_LINK_MODE=copy \
 COPY pyproject.toml uv.lock README.md ./
 COPY src/ src/
 
-RUN uv sync --frozen --no-dev --extra server --extra observability
+RUN uv sync --frozen --no-dev --extra server --extra observability --extra audit
 
 # Stage 2: minimal runtime image
 FROM python:3.12-slim
