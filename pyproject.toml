@@ -92,11 +92,15 @@ include = [
 addopts = "--strict-config --strict-markers --cov=reposage --cov-report=term-missing -p no:cacheprovider"
 norecursedirs = ["tests/fixtures"]
 testpaths = ["tests"]
+markers = [
+  "subprocess: tests that run a real pytest subprocess (inner audit)",
+]
 
 [tool.ruff]
 line-length = 100
 src = ["src", "tests"]
 target-version = "py312"
+extend-exclude = ["tests/fixtures"]
 
 [tool.ruff.lint]
 select = ["B", "C4", "E", "F", "I", "SIM", "UP"]

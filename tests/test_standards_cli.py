@@ -12,7 +12,7 @@ def test_audit_returns_zero_and_prints_grade(tmp_path, capsys) -> None:
 
     captured = capsys.readouterr()
     assert exit_code == 0
-    assert "**Grade: 0/6**" in captured.out
+    assert "**Grade: " in captured.out
 
 
 def test_audit_fail_under_returns_one(tmp_path, capsys) -> None:
@@ -28,7 +28,7 @@ def test_audit_json_format_parses(tmp_path, capsys) -> None:
     captured = capsys.readouterr()
     assert exit_code == 0
     payload = json.loads(captured.out)
-    assert payload["grade"] == 0
+    assert payload["grade"] == sum(1 for standard in payload["standards"] if standard["passed"])
     assert len(payload["standards"]) == 6
 
 

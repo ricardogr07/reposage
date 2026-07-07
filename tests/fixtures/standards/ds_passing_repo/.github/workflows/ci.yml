@@ -1,0 +1,20 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install
+        run: uv sync --frozen
+      - name: Run tests
+        run: pytest -q
+      - name: Evaluation gate
+        run: python evaluate.py
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish image
+        run: echo "deploy the container"

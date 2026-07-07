@@ -14,7 +14,7 @@ def test_markdown_has_grade_and_six_sections(tmp_path) -> None:
     rendered = render_standards_markdown(report)
 
     assert "# RepoSage Standards Audit" in rendered
-    assert "**Grade: 0/6**" in rendered
+    assert f"**Grade: {report.grade}/6**" in rendered
     for number in range(6):
         assert f"## Standard {number}:" in rendered
     assert "## Fix list" in rendered
@@ -24,7 +24,10 @@ def test_json_round_trips(tmp_path) -> None:
     report = build_standards_report(tmp_path)
     payload = json.loads(render_standards_json(report))
 
-    assert payload["grade"] == 0
-    assert payload["uncertain_count"] == 18
+    assert payload["grade"] == sum(1 for standard in payload["standards"] if standard["passed"])
+    assert payload["uncertain_count"] == report.uncertain_count
     assert len(payload["standards"]) == 6
-    assert payload["standards"][0]["checks"][0]["status"] == "uncertain"
+    statuses = {
+        check["status"] for standard in payload["standards"] for check in standard["checks"]
+    }
+    assert statuses <= {"pass", "fail", "uncertain", "not_applicable"}

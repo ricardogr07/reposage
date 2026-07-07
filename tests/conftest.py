@@ -3,10 +3,14 @@
 from __future__ import annotations
 
 import json
+import shutil
+import subprocess
 from pathlib import Path
 from types import ModuleType
 from typing import Any
 from unittest.mock import MagicMock
+
+import pytest
 
 from reposage.enrichment.models import DebtItem, EnrichmentResult, Improvement, ModuleRole
 from reposage.models import AuditReport
@@ -88,3 +92,34 @@ def make_fake_openai_module(tool_input: dict[str, Any]) -> ModuleType:
     openai_mod = MagicMock()
     openai_mod.OpenAI.return_value = client_instance
     return openai_mod  # type: ignore[return-value]
+
+
+def make_git_repo(
+    tmp_path: Path,
+    files: dict[str, str],
+    commits: list[list[str]] | None = None,
+) -> Path:
+    """Create a git repo under ``tmp_path`` and commit ``files`` in groups.
+
+    ``commits`` is a list of file-path groups, each committed together in order;
+    None commits everything as a single "initial" commit. Skips if git absent.
+    """
+    if shutil.which("git") is None:
+        pytest.skip("git not available")
+
+    def git(*args: str) -> None:
+        subprocess.run(["git", *args], cwd=tmp_path, check=True, capture_output=True, text=True)
+
+    git("init", "-b", "main")
+    git("config", "user.name", "Test")
+    git("config", "user.email", "test@example.com")
+
+    groups = commits if commits is not None else [list(files)]
+    for index, group in enumerate(groups):
+        for rel in group:
+            path = tmp_path / rel
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(files[rel], encoding="utf-8")
+        git("add", "-A")
+        git("commit", "-m", "initial" if commits is None else f"Add sources for step {index + 1}")
+    return tmp_path
