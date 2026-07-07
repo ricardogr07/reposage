@@ -1,0 +1,9 @@
+[project]
+name = "churnpkg"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = ["fastapi", "prometheus-client", "mlflow"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

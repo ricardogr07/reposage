@@ -14,6 +14,7 @@ from starlette.testclient import TestClient  # noqa: E402
 
 from reposage.server.app import (  # noqa: E402
     _audit,
+    _audit_standards,
     _clone,
     _resolve_token,
     _validate_repo_url,
@@ -95,6 +96,21 @@ def test_audit_enrich_without_key_raises(tmp_path: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Unit: _audit_standards helper
+# ---------------------------------------------------------------------------
+
+
+def test_audit_standards_returns_graded_markdown() -> None:
+    from tests.conftest import fixture_path
+
+    result = _audit_standards(
+        fixture_path("standards/ds_passing_repo"), run_subprocess_checks=False
+    )
+    assert "# RepoSage Standards Audit" in result
+    assert "**Grade:" in result
+
+
+# ---------------------------------------------------------------------------
 # Unit: _clone argument safety (mocked subprocess)
 # ---------------------------------------------------------------------------
 
@@ -124,7 +140,7 @@ def test_validate_url_rejects_embedded_token() -> None:
 
 def test_validate_url_rejects_user_and_password() -> None:
     with pytest.raises(ValueError, match="Credentials must not be embedded"):
-        _validate_repo_url("https://user:pass@github.com/org/repo")
+        _validate_repo_url("https://user:example-password@github.com/org/repo")
 
 
 # ---------------------------------------------------------------------------
@@ -175,6 +191,16 @@ def test_clone_token_passed_as_auth_header_not_in_url(tmp_path: Path) -> None:
     assert "ghp_test123" not in first_call_args[url_idx]
 
 
+def test_clone_full_depth_omits_depth_flag(tmp_path: Path) -> None:
+    dest = str(tmp_path / "repo")
+    with patch("reposage.server.app.subprocess.run") as mock_run:
+        mock_run.return_value = None
+        _clone("https://github.com/example/repo", "main", dest, depth=None)
+
+    first_call_args = mock_run.call_args_list[0][0][0]
+    assert "--depth" not in first_call_args
+
+
 def test_clone_without_token_excludes_auth_header(tmp_path: Path) -> None:
     dest = str(tmp_path / "repo")
     with patch("reposage.server.app.subprocess.run") as mock_run:
@@ -192,13 +218,13 @@ def test_clone_param_token_beats_env_var(tmp_path: Path) -> None:
     dest = str(tmp_path / "repo")
     with (
         patch("reposage.server.app.subprocess.run") as mock_run,
-        patch.dict("os.environ", {"GITHUB_TOKEN": "env_token"}),
+        patch.dict("os.environ", {"GITHUB_TOKEN": "example-env-token"}),
     ):
         mock_run.return_value = None
-        _clone("https://github.com/example/private", "main", dest, token="param_token")
+        _clone("https://github.com/example/private", "main", dest, token="example-param-token")
 
     first_call_args = mock_run.call_args_list[0][0][0]
-    param_b64 = base64.b64encode(b"x-access-token:param_token").decode()
-    env_b64 = base64.b64encode(b"x-access-token:env_token").decode()
+    param_b64 = base64.b64encode(b"x-access-token:example-param-token").decode()
+    env_b64 = base64.b64encode(b"x-access-token:example-env-token").decode()
     assert any(param_b64 in v for v in first_call_args if isinstance(v, str))
     assert not any(env_b64 in v for v in first_call_args if isinstance(v, str))

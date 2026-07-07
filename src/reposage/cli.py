@@ -88,6 +88,43 @@ def build_parser() -> argparse.ArgumentParser:
         help="Analyze Python public API surface and detect breaking changes.",
     )
 
+    audit_parser = subparsers.add_parser(
+        "audit",
+        help="Grade a repository against the Six Standards.",
+    )
+    audit_parser.add_argument("path", help="Path to the repository to audit.")
+    audit_parser.add_argument(
+        "--format",
+        choices=("markdown", "json", "github"),
+        default="markdown",
+        help="Output format.",
+    )
+    audit_parser.add_argument("--output", help="Optional path for audit output.")
+    audit_parser.add_argument(
+        "--run-subprocess-checks",
+        action="store_true",
+        default=False,
+        help="Allow checks that shell out (pytest, dependency install) to run.",
+    )
+    audit_parser.add_argument(
+        "--fail-under",
+        type=int,
+        default=0,
+        help="Exit non-zero when the grade is below this value.",
+    )
+    audit_parser.add_argument(
+        "--training-glob",
+        action="append",
+        default=[],
+        help="Glob pinning files to the training role (repeatable).",
+    )
+    audit_parser.add_argument(
+        "--serving-glob",
+        action="append",
+        default=[],
+        help="Glob pinning files to the serving role (repeatable).",
+    )
+
     return parser
 
 
@@ -104,6 +141,11 @@ def main(argv: list[str] | None = None) -> int:
     if not target_path.is_dir():
         print(f"error: path is not a directory: {target_path}", file=sys.stderr)
         return 2
+
+    if args.command == "audit":
+        from reposage.standards._cli import run_audit
+
+        return run_audit(args)
 
     report = build_audit_report(target_path)
 

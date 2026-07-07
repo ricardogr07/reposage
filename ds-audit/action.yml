@@ -1,0 +1,73 @@
+name: RepoSage DS/ML Audit
+description: >
+  Grade a data science / ML repository against the Six Standards
+  (Reproducible, Legible, Structured, Proven, Shipped, Accountable).
+author: RepoSage contributors
+
+branding:
+  icon: bar-chart-2
+  color: purple
+
+inputs:
+  path:
+    description: Path to the repository root to audit.
+    default: .
+  fail-under:
+    description: >
+      Exit non-zero when the grade is below this value (0-6). Defaults to 4:
+      a DS/ML repo should at least be Reproducible, Legible, Structured, and
+      Proven before it ships.
+    default: "4"
+  run-subprocess-checks:
+    description: Allow checks that shell out (pytest, dependency install) to run.
+    default: "false"
+  training-globs:
+    description: Comma-separated globs pinning files to the training role.
+    default: ""
+  serving-globs:
+    description: Comma-separated globs pinning files to the serving role.
+    default: ""
+  version:
+    description: >
+      RepoSage version to install (e.g. "0.4.0"). Defaults to latest. Pass
+      "local" to install from the action's own checkout (dogfooding).
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Install RepoSage
+      shell: bash
+      run: |
+        if [ "${{ inputs.version }}" = "local" ]; then
+          pip install "${GITHUB_ACTION_PATH}/.."
+        elif [ -n "${{ inputs.version }}" ]; then
+          pip install "reposage==${{ inputs.version }}"
+        else
+          pip install "reposage"
+        fi
+
+    - name: Run Six Standards audit
+      shell: bash
+      env:
+        INPUT_PATH: ${{ inputs.path }}
+        FAIL_UNDER: ${{ inputs.fail-under }}
+        TRAINING_GLOBS: ${{ inputs.training-globs }}
+        SERVING_GLOBS: ${{ inputs.serving-globs }}
+      run: |
+        FLAGS=()
+        if [ "${{ inputs.run-subprocess-checks }}" = "true" ]; then
+          FLAGS+=(--run-subprocess-checks)
+        fi
+        IFS=',' read -ra GLOBS <<< "$TRAINING_GLOBS"
+        for glob in "${GLOBS[@]}"; do
+          [ -n "$glob" ] && FLAGS+=(--training-glob "$glob")
+        done
+        IFS=',' read -ra GLOBS <<< "$SERVING_GLOBS"
+        for glob in "${GLOBS[@]}"; do
+          [ -n "$glob" ] && FLAGS+=(--serving-glob "$glob")
+        done
+        reposage audit "$INPUT_PATH" \
+          --format github \
+          --fail-under "$FAIL_UNDER" \
+          "${FLAGS[@]}"

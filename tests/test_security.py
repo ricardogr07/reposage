@@ -23,6 +23,17 @@ from tests.conftest import fixture_path, make_report
 SECURITY_FIXTURES = Path(__file__).parent / "fixtures" / "security"
 
 
+@pytest.fixture
+def no_live_tools(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Force run_or_load down its fallback-file path regardless of the env.
+
+    These tests assert parsing and fallback behavior. Whether pip-audit or
+    bandit happen to be installed in the test env must not change the outcome,
+    so we stub the subprocess seam to report the tool as absent.
+    """
+    monkeypatch.setattr("reposage.security._runner.run_tool", lambda *a, **k: None)
+
+
 # --- runner ---
 
 
@@ -59,7 +70,7 @@ def test_parse_pip_audit_fixture(tmp_path: Path) -> None:
     assert packages == {"requests", "urllib3"}
 
 
-def test_parse_pip_audit_empty_vulns(tmp_path: Path) -> None:
+def test_parse_pip_audit_empty_vulns(tmp_path: Path, no_live_tools: None) -> None:
     (tmp_path / "pip-audit-report.json").write_text(
         json.dumps({"dependencies": []}), encoding="utf-8"
     )
@@ -68,7 +79,7 @@ def test_parse_pip_audit_empty_vulns(tmp_path: Path) -> None:
     assert skip_reason == ""
 
 
-def test_parse_pip_audit_missing_returns_skip_reason(tmp_path: Path) -> None:
+def test_parse_pip_audit_missing_returns_skip_reason(tmp_path: Path, no_live_tools: None) -> None:
     findings, skip_reason = scan_pip_audit(tmp_path)
     assert findings == []
     assert skip_reason != ""
@@ -77,7 +88,7 @@ def test_parse_pip_audit_missing_returns_skip_reason(tmp_path: Path) -> None:
 # --- bandit ---
 
 
-def test_parse_bandit_fixture(tmp_path: Path) -> None:
+def test_parse_bandit_fixture(tmp_path: Path, no_live_tools: None) -> None:
     shutil.copy(SECURITY_FIXTURES / "bandit-report.json", tmp_path / "bandit-report.json")
     lint, skip_reason = scan_bandit(tmp_path)
     assert skip_reason == ""
@@ -87,7 +98,7 @@ def test_parse_bandit_fixture(tmp_path: Path) -> None:
     assert lint.warning_count == 1  # LOW
 
 
-def test_parse_bandit_invalid_json(tmp_path: Path) -> None:
+def test_parse_bandit_invalid_json(tmp_path: Path, no_live_tools: None) -> None:
     (tmp_path / "bandit-report.json").write_text("not json", encoding="utf-8")
     lint, skip_reason = scan_bandit(tmp_path)
     assert lint is None
@@ -186,7 +197,7 @@ def test_scan_security_returns_valid_summary_when_all_tools_skipped(tmp_path: Pa
     assert result.lint_summaries == []
 
 
-def test_scan_security_reads_pip_audit_fallback(tmp_path: Path) -> None:
+def test_scan_security_reads_pip_audit_fallback(tmp_path: Path, no_live_tools: None) -> None:
     shutil.copy(SECURITY_FIXTURES / "pip-audit-report.json", tmp_path / "pip-audit-report.json")
     report = make_report()
     report.dependencies.ecosystems = ["python"]

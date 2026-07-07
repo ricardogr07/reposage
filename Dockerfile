@@ -1,11 +1,17 @@
-# Stage 1: install dependencies into /deps
+# Stage 1: build a frozen virtualenv from the committed lockfile
 FROM python:3.12-slim AS builder
 
-WORKDIR /build
-COPY pyproject.toml README.md ./
+# uv resolves nothing at build time: it installs the exact pins in uv.lock.
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+
+WORKDIR /app
+ENV UV_LINK_MODE=copy \
+    UV_PYTHON_DOWNLOADS=never
+
+COPY pyproject.toml uv.lock README.md ./
 COPY src/ src/
 
-RUN pip install --no-cache-dir --target /deps ".[server,ai]"
+RUN uv sync --frozen --no-dev --extra server --extra observability --extra audit
 
 # Stage 2: minimal runtime image
 FROM python:3.12-slim
@@ -16,7 +22,8 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends git curl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /deps /usr/local/lib/python3.12/site-packages
+COPY --from=builder /app /app
+ENV PATH="/app/.venv/bin:${PATH}"
 
 RUN useradd -m -u 1000 reposage
 USER reposage

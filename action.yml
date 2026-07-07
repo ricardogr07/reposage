@@ -27,6 +27,19 @@ inputs:
   version:
     description: RepoSage version to install (e.g. "0.2.0"). Defaults to latest.
     default: ""
+  mode:
+    description: report or audit
+    default: report
+  fail-under:
+    description: >
+      Six Standards audit mode only: exit non-zero when the grade is below this
+      value (0-6).
+    default: "0"
+  run-subprocess-checks:
+    description: >
+      Six Standards audit mode only: allow checks that shell out (pytest,
+      dependency install) to run.
+    default: "false"
 
 outputs:
   report-path:
@@ -54,13 +67,26 @@ runs:
       shell: bash
       env:
         ANTHROPIC_API_KEY: ${{ inputs.anthropic-api-key }}
+        INPUT_PATH: ${{ inputs.path }}
+        FAIL_UNDER: ${{ inputs.fail-under }}
       run: |
-        ENRICH_FLAG=""
-        if [ "${{ inputs.enrich }}" = "true" ]; then
-          ENRICH_FLAG="--enrich"
+        if [ "${{ inputs.mode }}" = "audit" ]; then
+          SUBPROC_FLAG=""
+          if [ "${{ inputs.run-subprocess-checks }}" = "true" ]; then
+            SUBPROC_FLAG="--run-subprocess-checks"
+          fi
+          reposage audit "$INPUT_PATH" \
+            --format github \
+            --fail-under "$FAIL_UNDER" \
+            $SUBPROC_FLAG
+        else
+          ENRICH_FLAG=""
+          if [ "${{ inputs.enrich }}" = "true" ]; then
+            ENRICH_FLAG="--enrich"
+          fi
+          reposage report "$INPUT_PATH" \
+            --format "${{ inputs.format }}" \
+            --output "${{ inputs.output }}" \
+            $ENRICH_FLAG
+          echo "report-path=${{ inputs.output }}" >> "$GITHUB_OUTPUT"
         fi
-        reposage report "${{ inputs.path }}" \
-          --format "${{ inputs.format }}" \
-          --output "${{ inputs.output }}" \
-          $ENRICH_FLAG
-        echo "report-path=${{ inputs.output }}" >> "$GITHUB_OUTPUT"

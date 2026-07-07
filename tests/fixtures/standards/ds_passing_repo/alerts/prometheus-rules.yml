@@ -1,0 +1,10 @@
+groups:
+  - name: churn
+    rules:
+      - alert: ChurnRequestsStalled
+        expr: rate(churn_requests_total[5m]) == 0
+        for: 10m
+        labels:
+          severity: page
+        annotations:
+          summary: "Churn scoring has stopped serving requests"
