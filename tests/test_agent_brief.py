@@ -65,7 +65,7 @@ def test_model_id_in_header_when_enriched() -> None:
     enrichment = make_enrichment()
     brief = render_agent_brief(report, enrichment=enrichment)
 
-    assert "claude-haiku-4-5-20251001" in brief
+    assert "claude-opus-4-8" in brief
 
 
 def test_do_not_touch_section_present() -> None:

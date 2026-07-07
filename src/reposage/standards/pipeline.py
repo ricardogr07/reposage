@@ -73,9 +73,11 @@ def build_standards_report(root: Path, config: StandardsConfig | None = None) ->
         grade=grade,
         fix_list=fix_list,
         uncertain_count=uncertain_count,
-        # ponytail: no subprocess check runs in chunk 1; real ones land later.
-        subprocess_checks_ran=False,
+        subprocess_checks_ran=config.run_subprocess_checks,
         notes=notes,
+        is_ds_repo=ctx.is_ds_repo,
+        training_files=sum(1 for role in ctx.roles.values() if role == "training"),
+        serving_files=sum(1 for role in ctx.roles.values() if role == "serving"),
     )
 
 

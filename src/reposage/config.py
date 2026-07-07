@@ -44,8 +44,10 @@ DEFAULT_SCAN_CONFIG = ScanConfig()
 class EnrichConfig:
     """Configuration for optional AI enrichment."""
 
-    model: str = "claude-haiku-4-5-20251001"
-    timeout_seconds: int = 30
+    # Opus-class model: enrichment is one synthesis call per audit, so the
+    # richer read of module roles and debt is worth the per-call cost.
+    model: str = "claude-opus-4-8"
+    timeout_seconds: int = 60
     max_debt_items: int = 5
 
 

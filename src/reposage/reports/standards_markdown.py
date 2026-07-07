@@ -24,10 +24,18 @@ def render_standards_markdown(report: StandardsReport) -> str:
     if any("skipped by config" in note for note in report.notes):
         grade_line += " (includes checks skipped by config)"
 
+    profile = "general"
+    if report.is_ds_repo:
+        profile = (
+            f"data science / ML ({report.training_files} training, "
+            f"{report.serving_files} serving file(s))"
+        )
+
     lines = [
         "# RepoSage Standards Audit",
         "",
         f"- Root path: `{report.root_path}`",
+        f"- Profile: {profile}",
         f"- Uncertain checks: {report.uncertain_count}",
         "",
         grade_line,

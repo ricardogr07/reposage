@@ -55,7 +55,7 @@ def make_enrichment(roles: int = 1, debts: int = 1, improvements: int = 5) -> En
             Improvement(rank=i + 1, title=f"Improve {i}", rationale="Because.", effort="low")
             for i in range(improvements)
         ],
-        model_id="claude-haiku-4-5-20251001",
+        model_id="claude-opus-4-8",
     )
 
 

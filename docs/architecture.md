@@ -29,7 +29,7 @@ src/reposage/
 ├── enrichment/
 │   ├── provider.py    — EnrichmentProvider Protocol + enrich_report() dispatcher
 │   ├── models.py      — EnrichmentResult, ModuleRole, DebtItem, Improvement dataclasses
-│   ├── anthropic_provider.py — Anthropic SDK implementation (claude-haiku default)
+│   ├── anthropic_provider.py — Anthropic SDK implementation (claude-opus default)
 │   ├── openai_provider.py    — OpenAI SDK implementation (gpt-4o-mini default)
 │   ├── classify_prompt.py    — module-role classification prompt + JSON schema
 │   ├── debt_prompt.py        — technical-debt prompt + JSON schema

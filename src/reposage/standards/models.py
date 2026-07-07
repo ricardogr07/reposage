@@ -79,6 +79,9 @@ class StandardsReport:
     uncertain_count: int
     subprocess_checks_ran: bool
     notes: list[str] = field(default_factory=list)
+    is_ds_repo: bool = False
+    training_files: int = 0
+    serving_files: int = 0
 
     def to_dict(self) -> dict[str, Any]:
         """Return a JSON-serializable representation of the report."""

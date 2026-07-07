@@ -39,6 +39,28 @@ def test_markdown_has_grade_and_six_sections(tmp_path) -> None:
     assert "## Fix list" in rendered
 
 
+def test_markdown_profile_line_general(tmp_path) -> None:
+    rendered = render_standards_markdown(build_standards_report(tmp_path))
+
+    assert "- Profile: general" in rendered
+
+
+def test_markdown_profile_line_ds(tmp_path) -> None:
+    (tmp_path / "train.py").write_text("import sklearn\n", encoding="utf-8")
+    rendered = render_standards_markdown(build_standards_report(tmp_path))
+
+    assert "- Profile: data science / ML (1 training, 0 serving file(s))" in rendered
+
+
+def test_json_includes_ds_profile(tmp_path) -> None:
+    (tmp_path / "train.py").write_text("import sklearn\n", encoding="utf-8")
+    payload = json.loads(render_standards_json(build_standards_report(tmp_path)))
+
+    assert payload["is_ds_repo"] is True
+    assert payload["training_files"] == 1
+    assert payload["serving_files"] == 0
+
+
 def test_json_round_trips(tmp_path) -> None:
     report = build_standards_report(tmp_path)
     payload = json.loads(render_standards_json(report))
