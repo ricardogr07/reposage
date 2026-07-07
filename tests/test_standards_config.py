@@ -76,6 +76,18 @@ def test_exclude_globs_parses_list(tmp_path) -> None:
     assert warnings == []
 
 
+def test_secrets_exclude_globs_parses_list(tmp_path) -> None:
+    (tmp_path / "pyproject.toml").write_text(
+        '[tool.reposage.audit]\nsecrets_exclude_globs = ["tests/**"]\n',
+        encoding="utf-8",
+    )
+
+    config, warnings = load_standards_config(tmp_path)
+
+    assert config.secrets_exclude_globs == ("tests/**",)
+    assert warnings == []
+
+
 def test_unknown_key_warning(tmp_path) -> None:
     (tmp_path / "reposage.toml").write_text(
         "[audit]\nbogus_key = 1\n",

@@ -83,6 +83,9 @@ ai = [
 # Dogfood the exclude_globs knob: fixture repos and example outputs are inputs
 # to the audit, not code to be graded against the Six Standards.
 exclude_globs = ["tests/fixtures/**", "examples/**"]
+# The secret scanner's own tests plant credential-shaped bait; scope the secret
+# scan (tree and history) away from tests. The report annotates this scope.
+secrets_exclude_globs = ["tests/**"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/reposage"]

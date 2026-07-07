@@ -119,6 +119,60 @@ def test_config_external_history_secret_fails(tmp_path: Path) -> None:
     assert any("history" in line for line in check.evidence)
 
 
+_SCOPED = StandardsConfig(secrets_exclude_globs=("bait/**",))
+
+
+def test_config_external_scoped_tree_secret_passes(tmp_path: Path) -> None:
+    _write(tmp_path, "bait/settings.py", 'api_key = "sk-abcdef1234567890abcdef"\n')
+    check = _check(tmp_path, "s2.config_external", _SCOPED)
+    assert check.status is CheckStatus.PASS
+    assert any("secret scan scoped" in line for line in check.evidence)
+
+
+def test_config_external_scope_does_not_hide_unscoped_secret(tmp_path: Path) -> None:
+    _write(tmp_path, "settings.py", 'api_key = "sk-abcdef1234567890abcdef"\n')
+    check = _check(tmp_path, "s2.config_external", _SCOPED)
+    assert check.status is CheckStatus.FAIL
+    assert any("secret scan scoped" in line for line in check.evidence)
+
+
+def test_config_external_scoped_history_secret_passes(tmp_path: Path) -> None:
+    if shutil.which("git") is None:
+        pytest.skip("git not available")
+
+    def git(*args: str) -> None:
+        subprocess.run(["git", *args], cwd=tmp_path, check=True, capture_output=True, text=True)
+
+    git("init", "-b", "main")
+    git("config", "user.name", "T")
+    git("config", "user.email", "t@e.com")
+    _write(tmp_path, "bait/settings.py", 'api_key = "sk-abcdef1234567890abcdef"\n')
+    _write(tmp_path, "README.md", "clean\n")
+    git("add", "-A")
+    git("commit", "-m", "Add bait fixture")
+
+    assert _check(tmp_path, "s2.config_external", _SCOPED).status is CheckStatus.PASS
+    assert _check(tmp_path, "s2.config_external").status is CheckStatus.FAIL
+
+
+def test_config_external_history_annotation_not_flagged(tmp_path: Path) -> None:
+    if shutil.which("git") is None:
+        pytest.skip("git not available")
+
+    def git(*args: str) -> None:
+        subprocess.run(["git", *args], cwd=tmp_path, check=True, capture_output=True, text=True)
+
+    git("init", "-b", "main")
+    git("config", "user.name", "T")
+    git("config", "user.email", "t@e.com")
+    _write(tmp_path, "client.py", "def fetch(token: str | None = None) -> None:\n    pass\n")
+    git("add", "-A")
+    git("commit", "-m", "Add client with token parameter")
+
+    check = _check(tmp_path, "s2.config_external")
+    assert check.status is CheckStatus.PASS
+
+
 def test_config_external_env_example_missing_var_fails(tmp_path: Path) -> None:
     _write(tmp_path, "config.py", 'import os\nu = os.getenv("API_URL")\np = os.getenv("DB_PASS")\n')
     _write(tmp_path, ".env.example", "API_URL=\n")

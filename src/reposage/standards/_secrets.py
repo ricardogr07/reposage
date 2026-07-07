@@ -8,7 +8,7 @@ from pathlib import Path
 
 from reposage.standards._subproc import run
 from reposage.standards.config import StandardsConfig
-from reposage.standards.context import AuditContext
+from reposage.standards.context import AuditContext, _is_excluded
 from reposage.standards.models import CheckResult, CheckStatus
 
 # (label, tree regex, history regex). History patterns stay POSIX-ERE friendly
@@ -22,7 +22,9 @@ _OPENAI = re.compile(r"sk-[A-Za-z0-9]{20,}")
 _TREE_PATTERNS = (_ASSIGN, _URL_CRED, _AKIA, _OPENAI)
 
 _HISTORY_PATTERNS = (
-    r"(api_key|apikey|secret|token|password|passwd)[[:space:]]*[:=]",
+    # Mirror _ASSIGN's quoted-literal requirement; a bare `token:` matches every
+    # function annotation and workflow yaml key ever committed.
+    r"(api_key|apikey|secret|token|password|passwd)[[:space:]]*[:=][[:space:]]*[\"'][^\"']{8,}[\"']",
     r"AKIA[0-9A-Z]{16}",
     r"sk-[A-Za-z0-9]{20}",
 )
@@ -51,14 +53,23 @@ def evaluate_config_external(ctx: AuditContext, config: StandardsConfig) -> Chec
     """Combine tree, history, and .env.example checks into one CheckResult."""
 
     cid, name = "s2.config_external", "Config externalization"
-    tree_hits = _scan_tree(ctx)
+    tree_hits = _scan_tree(ctx, config)
     env_fail = _env_example_gaps(ctx)
     history_hits, history_uncertain = _scan_history(ctx, config)
+
+    # A scoped-out path is always announced, so a narrowed scan is visible
+    # in the report rather than silently blessing whatever it skipped.
+    scope_note = (
+        [f"secret scan scoped: excluded {', '.join(config.secrets_exclude_globs)}"]
+        if config.secrets_exclude_globs
+        else []
+    )
 
     evidence: list[str] = []
     evidence.extend(tree_hits)
     evidence.extend(env_fail)
     evidence.extend(history_hits)
+    evidence.extend(scope_note)
 
     if tree_hits or env_fail or history_hits:
         return CheckResult(
@@ -73,19 +84,25 @@ def evaluate_config_external(ctx: AuditContext, config: StandardsConfig) -> Chec
             cid,
             name,
             CheckStatus.UNCERTAIN,
-            evidence=["git history scan for secrets was inconclusive (timeout or git missing)"],
+            evidence=["git history scan for secrets was inconclusive (timeout or git missing)"]
+            + scope_note,
             remediation="Re-run with git available to scan history for leaked credentials.",
         )
     return CheckResult(
-        cid, name, CheckStatus.PASS, evidence=["no credential-shaped literals found"]
+        cid,
+        name,
+        CheckStatus.PASS,
+        evidence=["no credential-shaped literals found"] + scope_note,
     )
 
 
-def _scan_tree(ctx: AuditContext) -> list[str]:
+def _scan_tree(ctx: AuditContext, config: StandardsConfig) -> list[str]:
     hits: list[str] = []
     for record in ctx.file_records:
         ext = (record.extension or "").lower()
         if ext in _BINARY_EXT or record.size_bytes > _MAX_BYTES:
+            continue
+        if config.secrets_exclude_globs and _is_excluded(record.path, config.secrets_exclude_globs):
             continue
         path = ctx.root / record.path
         try:
@@ -110,10 +127,11 @@ def _scan_history(ctx: AuditContext, config: StandardsConfig) -> tuple[list[str]
     if not ctx.has_git:
         return [], False
     depth = str(config.history_scan_depth)
+    pathspec = _history_pathspec(config.secrets_exclude_globs)
     hits: list[str] = []
     for pattern in _HISTORY_PATTERNS:
         proc = run(
-            ["git", "log", "-E", "-n", depth, f"-G{pattern}", "--format=%h"],
+            ["git", "log", "-E", "-n", depth, f"-G{pattern}", "--format=%h", *pathspec],
             cwd=ctx.root,
             timeout=config.git_timeout,
         )
@@ -125,6 +143,24 @@ def _scan_history(ctx: AuditContext, config: StandardsConfig) -> tuple[list[str]
         if shas:
             hits.append(f"credential-shaped literal in history (e.g. commit {shas[0]})")
     return hits, False
+
+
+def _history_pathspec(globs: tuple[str, ...]) -> list[str]:
+    """Translate secrets_exclude_globs into git pathspec exclude arguments.
+
+    A trailing ``/**`` becomes a directory pathspec (git's default matching
+    already covers everything under a directory); other patterns use glob magic.
+    """
+
+    if not globs:
+        return []
+    spec = ["--", "."]
+    for pattern in globs:
+        if pattern.endswith("/**"):
+            spec.append(f":(exclude){pattern[:-3]}/")
+        else:
+            spec.append(f":(exclude,glob){pattern}")
+    return spec
 
 
 def _env_example_gaps(ctx: AuditContext) -> list[str]:

@@ -3,11 +3,10 @@
 This dogfoods the audit engine end to end with the repo's own config
 (exclude_globs and all) plus subprocess checks, and pins the real result.
 
-The pinned grade is 5/6. Standard 2 is the single, honest failure: RepoSage's
-scanner tests necessarily plant credential-shaped literals in scanned test
-modules (see tests/test_standards_exclusion.py), which the config-externalization
-check flags. Every other standard, including Standard 5 (Accountable) after the
-observability work, passes.
+The pinned grade is 6/6. The scanner's own tests plant credential-shaped bait
+in scanned test modules, so the repo's config scopes the secret scan away from
+tests/ via secrets_exclude_globs; the scope is annotated in the check's
+evidence rather than hidden, and this test asserts the annotation is present.
 """
 
 from __future__ import annotations
@@ -58,10 +57,12 @@ def test_self_audit_grade_and_standards() -> None:
     for number in (0, 1, 3, 4):
         assert _standard(report, number).passed, f"S{number} should pass"
 
-    # Standard 2 is the single, honest failure: the scanner's own tests plant
-    # credential-shaped literals in scanned test modules.
+    # Standard 2 passes with the secret scan visibly scoped away from the
+    # scanner's own planted test bait (secrets_exclude_globs in pyproject.toml).
     s2 = _standard(report, 2)
-    assert not s2.passed
-    assert _status(s2, "s2.config_external") is CheckStatus.FAIL
+    assert s2.passed, f"S2 should pass; checks: {s2.checks}"
+    config_check = next(c for c in s2.checks if c.check_id == "s2.config_external")
+    assert config_check.status is CheckStatus.PASS
+    assert any("secret scan scoped" in line for line in config_check.evidence)
 
-    assert report.grade == 5
+    assert report.grade == 6

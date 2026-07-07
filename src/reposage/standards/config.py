@@ -25,6 +25,7 @@ class StandardsConfig:
     serving_globs: tuple[str, ...] = ()
     training_globs: tuple[str, ...] = ()
     exclude_globs: tuple[str, ...] = ()
+    secrets_exclude_globs: tuple[str, ...] = ()
 
 
 DEFAULT_STANDARDS_CONFIG = StandardsConfig()
@@ -43,6 +44,7 @@ _FIELDS: dict[str, Callable[[Any], Any]] = {
     "serving_globs": lambda v: tuple(v),
     "training_globs": lambda v: tuple(v),
     "exclude_globs": lambda v: tuple(v),
+    "secrets_exclude_globs": lambda v: tuple(v),
 }
 
 # Nested sub-tables whose keys are flattened onto the top-level field namespace.
