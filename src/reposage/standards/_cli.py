@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import argparse
+import os
 from dataclasses import replace
 from pathlib import Path
 
+from reposage.reports.standards_github import render_standards_github
 from reposage.reports.standards_json import render_standards_json
 from reposage.reports.standards_markdown import render_standards_markdown
 from reposage.standards.config import load_standards_config
@@ -24,14 +26,16 @@ def run_audit(args: argparse.Namespace) -> int:
     if warnings:
         report.notes = [*warnings, *report.notes]
 
-    markdown = render_standards_markdown(report)
     if args.format == "json":
         output = render_standards_json(report)
     elif args.format == "github":
-        # ponytail: minimal CI annotation; full GitHub format lands in a later chunk.
-        output = f"::notice::RepoSage grade: {report.grade}/6\n{markdown}"
+        output = render_standards_github(report)
+        summary = os.environ.get("GITHUB_STEP_SUMMARY")
+        if summary:
+            with Path(summary).open("a", encoding="utf-8") as handle:
+                handle.write(render_standards_markdown(report))
     else:
-        output = markdown
+        output = render_standards_markdown(report)
 
     if args.output:
         Path(args.output).write_text(output, encoding="utf-8")

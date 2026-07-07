@@ -34,9 +34,21 @@ src/reposage/
 │   ├── classify_prompt.py    — module-role classification prompt + JSON schema
 │   ├── debt_prompt.py        — technical-debt prompt + JSON schema
 │   └── synthesis_prompt.py   — top-improvements prompt + JSON schema
+├── standards/
+│   ├── models.py      — CheckResult / StandardResult / StandardsReport dataclasses
+│   ├── config.py      — StandardsConfig + [tool.reposage.audit] loader (exclude_globs, thresholds)
+│   ├── context.py     — one filesystem walk + AST parse + role classification, shared by all checks
+│   ├── pipeline.py    — build_standards_report(): runs the six evaluators, computes the 0-6 grade
+│   ├── s0_reproducible.py … s5_accountable.py — the six standards' checks
+│   ├── _secrets.py    — credential detection for s2 (tree, git history, .env)
+│   ├── _subproc.py    — subprocess helper with a hard timeout
+│   └── _cli.py        — the `audit` subcommand handler
 ├── reports/
 │   ├── markdown.py    — Markdown renderer (with optional enrichment sections)
-│   └── json_report.py — JSON renderer (with optional enrichment key)
+│   ├── json_report.py — JSON renderer (with optional enrichment key)
+│   ├── standards_markdown.py — Markdown grade card for the Six Standards audit
+│   ├── standards_json.py     — JSON rendering of the Six Standards audit
+│   └── standards_github.py   — GitHub Actions workflow-command annotations for the audit
 └── server/
     └── app.py         — FastMCP HTTP server exposing audit_repository tool
 ```

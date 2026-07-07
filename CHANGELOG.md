@@ -7,6 +7,23 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Six Standards audit mode (`reposage audit PATH`): grades a repository 0-6
+  against the six standards (Reproducible, Legible, Structured, Proven, Shipped,
+  Accountable), with 18 deterministic checks and an optional
+  `--run-subprocess-checks` gate for checks that execute the test suite.
+- `[tool.reposage.audit]` / `[audit]` config table, including an `exclude_globs`
+  knob that drops fixture and example trees from the audit (they are inputs, not
+  code to grade).
+- `--format github` output: GitHub Actions `::error` / `::warning` / `::notice`
+  workflow-command annotations, plus the Markdown grade card appended to
+  `GITHUB_STEP_SUMMARY` when set.
+- `action.yml` gains `mode` (report or audit), `fail-under`, and
+  `run-subprocess-checks` inputs so the Action can run either mode.
+- `tox -e selfaudit`: RepoSage grades its own repository against the Six
+  Standards as a structural regression check.
+
 ## [0.3.0] — 2026-04-28
 
 ### Added

@@ -32,6 +32,19 @@ def test_audit_json_format_parses(tmp_path, capsys) -> None:
     assert len(payload["standards"]) == 6
 
 
+def test_audit_github_format_writes_step_summary(tmp_path, monkeypatch, capsys) -> None:
+    summary = tmp_path / "summary.md"
+    monkeypatch.setenv("GITHUB_STEP_SUMMARY", str(summary))
+
+    exit_code = main(["audit", str(tmp_path), "--format", "github"])
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "::notice::RepoSage grade:" in captured.out
+    assert summary.exists()
+    assert "# RepoSage Standards Audit" in summary.read_text(encoding="utf-8")
+
+
 def test_audit_output_flag_writes_file(tmp_path) -> None:
     out_file = tmp_path / "audit.md"
     exit_code = main(["audit", str(tmp_path), "--output", str(out_file)])

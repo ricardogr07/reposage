@@ -46,6 +46,10 @@ def build_context(root: Path, config: StandardsConfig) -> AuditContext:
 
     resolved = root.resolve()
     file_records, _ = scan_repository(resolved, DEFAULT_SCAN_CONFIG)
+    if config.exclude_globs:
+        file_records = [
+            record for record in file_records if not _is_excluded(record.path, config.exclude_globs)
+        ]
 
     python_asts: dict[str, ast.Module] = {}
     roles: dict[str, str] = {}
@@ -86,6 +90,24 @@ def build_context(root: Path, config: StandardsConfig) -> AuditContext:
         has_git=(resolved / ".git").exists(),
         workflow_files=workflow_files,
     )
+
+
+def _is_excluded(rel: str, patterns: tuple[str, ...]) -> bool:
+    """Return True when ``rel`` matches any exclusion glob.
+
+    fnmatch does not treat ``**`` specially, so a trailing ``/**`` is handled as
+    a directory-prefix match (the directory itself and anything nested under it).
+    """
+
+    norm = rel.replace("\\", "/")
+    for pattern in patterns:
+        if pattern.endswith("/**"):
+            prefix = pattern[:-3]
+            if norm == prefix or norm.startswith(prefix + "/"):
+                return True
+        elif fnmatch(norm, pattern):
+            return True
+    return False
 
 
 def _classify(rel: str, imported: set[str], config: StandardsConfig) -> str:

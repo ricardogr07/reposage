@@ -67,6 +67,45 @@ for the human-readable Markdown report. Pass `--output FILE` to write to a file
 instead of stdout. Pass `--enrich` to add AI-generated module roles, debt items,
 and top-5 improvements (requires `reposage[ai]` and `ANTHROPIC_API_KEY`).
 
+## Six Standards audit
+
+Alongside the descriptive `report`, RepoSage has a second, opinionated mode:
+`reposage audit .` grades a repository from 0 to 6 against the Six Standards of
+production-grade code. A repo earns one point per standard it fully passes:
+
+0. **Reproducible** — pinned environment, lockfile, seeded determinism.
+1. **Legible** — readable structure, naming, and docstring coverage.
+2. **Structured** — clear layering and externalized configuration (no secrets in source).
+3. **Proven** — a real test suite that asserts behavior and gates model quality.
+4. **Shipped** — a deploy path, an isolated environment, and gated CI/CD.
+5. **Accountable** — meaningful history, ownership, and observability.
+
+```bash
+# Markdown grade card (stdout)
+reposage audit .
+
+# Machine-readable JSON, or GitHub Actions annotations for CI
+reposage audit . --format json
+reposage audit . --format github --fail-under 4
+
+# Allow checks that shell out (runs your test suite, etc.)
+reposage audit . --run-subprocess-checks
+```
+
+Configure the audit under `[tool.reposage.audit]` in `pyproject.toml` (or an
+`[audit]` table in `reposage.toml`). For example, keep fixture and example trees
+out of the grade:
+
+```toml
+[tool.reposage.audit]
+exclude_globs = ["tests/fixtures/**", "examples/**"]
+```
+
+`--format github` emits `::error` / `::warning` / `::notice` workflow commands so
+failing checks surface as inline annotations, and writes the full Markdown grade
+card to the job summary when `GITHUB_STEP_SUMMARY` is set. The module layout is
+described in [docs/architecture.md](docs/architecture.md).
+
 ## GitHub Action
 
 Add RepoSage to any workflow to audit your repository on every push:

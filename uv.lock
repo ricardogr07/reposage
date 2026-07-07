@@ -1071,6 +1071,7 @@ dev = [
 server = [
     { name = "httpx" },
     { name = "mcp", extra = ["cli"] },
+    { name = "starlette" },
     { name = "uvicorn" },
 ]
 
@@ -1103,6 +1104,7 @@ requires-dist = [
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=6.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.11" },
+    { name = "starlette", marker = "extra == 'server'", specifier = ">=0.37" },
     { name = "tox", marker = "extra == 'dev'", specifier = ">=4.27" },
     { name = "uvicorn", marker = "extra == 'server'", specifier = ">=0.30" },
 ]

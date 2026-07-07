@@ -24,6 +24,7 @@ class StandardsConfig:
     git_timeout: int = 10
     serving_globs: tuple[str, ...] = ()
     training_globs: tuple[str, ...] = ()
+    exclude_globs: tuple[str, ...] = ()
 
 
 DEFAULT_STANDARDS_CONFIG = StandardsConfig()
@@ -41,6 +42,7 @@ _FIELDS: dict[str, Callable[[Any], Any]] = {
     "git_timeout": int,
     "serving_globs": lambda v: tuple(v),
     "training_globs": lambda v: tuple(v),
+    "exclude_globs": lambda v: tuple(v),
 }
 
 # Nested sub-tables whose keys are flattened onto the top-level field namespace.

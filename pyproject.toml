@@ -43,6 +43,7 @@ ai = [
 server = [
   "httpx>=0.27",
   "mcp[cli]>=1.0",
+  "starlette>=0.37",
   "uvicorn>=0.30",
 ]
 
@@ -73,6 +74,11 @@ ai = [
   "pytest-cov>=6.0",
 ]
 
+[tool.reposage.audit]
+# Dogfood the exclude_globs knob: fixture repos and example outputs are inputs
+# to the audit, not code to be graded against the Six Standards.
+exclude_globs = ["tests/fixtures/**", "examples/**"]
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/reposage"]
 
@@ -89,11 +95,12 @@ include = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "--strict-config --strict-markers --cov=reposage --cov-report=term-missing -p no:cacheprovider"
+addopts = "--strict-config --strict-markers --cov=reposage --cov-report=term-missing -p no:cacheprovider -m \"not self_audit\""
 norecursedirs = ["tests/fixtures"]
 testpaths = ["tests"]
 markers = [
   "subprocess: tests that run a real pytest subprocess (inner audit)",
+  "self_audit: runs a full audit of this repo against itself (opt in via tox -e selfaudit)",
 ]
 
 [tool.ruff]
