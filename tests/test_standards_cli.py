@@ -45,6 +45,18 @@ def test_audit_github_format_writes_step_summary(tmp_path, monkeypatch, capsys) 
     assert "# RepoSage Standards Audit" in summary.read_text(encoding="utf-8")
 
 
+def test_audit_role_glob_flags_pin_roles(tmp_path, capsys) -> None:
+    (tmp_path / "core.py").write_text("x = 1\n", encoding="utf-8")
+
+    exit_code = main(["audit", str(tmp_path), "--training-glob", "core.py", "--format", "json"])
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    payload = json.loads(captured.out)
+    assert payload["is_ds_repo"] is True
+    assert payload["training_files"] == 1
+
+
 def test_audit_output_flag_writes_file(tmp_path) -> None:
     out_file = tmp_path / "audit.md"
     exit_code = main(["audit", str(tmp_path), "--output", str(out_file)])

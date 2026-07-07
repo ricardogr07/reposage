@@ -106,6 +106,40 @@ failing checks surface as inline annotations, and writes the full Markdown grade
 card to the job summary when `GITHUB_STEP_SUMMARY` is set. The module layout is
 described in [docs/architecture.md](docs/architecture.md).
 
+## Data science and ML repositories
+
+RepoSage is a general-purpose auditor, but the Six Standards engine is
+DS/ML-aware. During the audit's single repository walk, every Python file is
+classified into a role: `training`, `serving`, `pipeline`, `data`, `test`, or
+`other`. Classification uses path tokens first (`train.py`, `serve.py`,
+`pipeline/`), then imports (`torch`/`sklearn`/`xgboost` mark training code;
+`fastapi`/`flask`/`mcp` mark serving code), and finally explicit config globs,
+which win over both. A repo with any training or serving code, or any DS import
+(`pandas`, `numpy`, `scipy`, `polars`), is profiled as data science / ML; the
+grade card's header says which profile was detected.
+
+Several checks change behavior based on those roles:
+
+- **s0.determinism** looks for seed calls only in training and pipeline code,
+  and passes with a note when no random sources exist.
+- **s2.boundaries** flags raw I/O (`read_csv`, `requests.get`) only inside
+  training or serving files; I/O belongs in `data` modules.
+- **s3.eval_gate** requires a model-quality gate only when training code
+  exists; a repo with no trained model passes with "not applicable" noted.
+- **s5** (logs, metrics, alerting) reports `NOT_APPLICABLE` instead of failing
+  when there is no serving or training surface to observe.
+
+When the heuristics misclassify a file, pin its role explicitly:
+
+```toml
+[tool.reposage.audit]
+serving_globs = ["src/mypkg/handlers/*.py"]
+training_globs = ["src/mypkg/fit_*.py"]
+# Scope the secret scan away from paths that plant credential-shaped bait
+# on purpose (scanner tests, honeypots). The grade card announces the scope.
+secrets_exclude_globs = ["tests/**"]
+```
+
 ## GitHub Action
 
 Add RepoSage to any workflow to audit your repository on every push:
@@ -127,8 +161,26 @@ Add RepoSage to any workflow to audit your repository on every push:
     path: reposage-report.md
 ```
 
-See [`.github/workflows/demo.yml`](.github/workflows/demo.yml) for a complete
-example, and [`examples/`](examples/) for sample audit outputs.
+For DS/ML repositories there is a dedicated action wrapping the Six Standards
+audit: annotations land inline on the PR, the grade card lands in the job
+summary, and the job fails below a grade floor (default 4):
+
+```yaml
+- uses: actions/setup-python@v5
+  with:
+    python-version: "3.12"
+
+- uses: ricardogr07/reposage/ds-audit@main
+  with:
+    path: .
+    fail-under: "4"
+    training-globs: "src/mypkg/fit_*.py"
+```
+
+Check out with `fetch-depth: 0`; the audit's history checks are meaningless on
+a shallow clone. See [`.github/workflows/demo.yml`](.github/workflows/demo.yml)
+for a complete example of both actions, and [`examples/`](examples/) for sample
+audit outputs.
 
 ## Development
 

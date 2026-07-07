@@ -21,6 +21,10 @@ def run_audit(args: argparse.Namespace) -> int:
     config, warnings = load_standards_config(root)
     if args.run_subprocess_checks:
         config = replace(config, run_subprocess_checks=True)
+    if getattr(args, "training_glob", None):
+        config = replace(config, training_globs=(*config.training_globs, *args.training_glob))
+    if getattr(args, "serving_glob", None):
+        config = replace(config, serving_globs=(*config.serving_globs, *args.serving_glob))
 
     report = build_standards_report(root, config)
     if warnings:

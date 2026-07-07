@@ -112,6 +112,18 @@ def build_parser() -> argparse.ArgumentParser:
         default=0,
         help="Exit non-zero when the grade is below this value.",
     )
+    audit_parser.add_argument(
+        "--training-glob",
+        action="append",
+        default=[],
+        help="Glob pinning files to the training role (repeatable).",
+    )
+    audit_parser.add_argument(
+        "--serving-glob",
+        action="append",
+        default=[],
+        help="Glob pinning files to the serving role (repeatable).",
+    )
 
     return parser
 

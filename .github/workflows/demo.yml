@@ -32,3 +32,24 @@ jobs:
           name: reposage-report
           path: reposage-report.md
           retention-days: 30
+
+  ds-audit:
+    name: Six Standards grade (ds-audit action)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Grade with the DS/ML action
+        uses: ./ds-audit
+        with:
+          path: .
+          fail-under: "4"
+          version: local
