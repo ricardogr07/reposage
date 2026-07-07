@@ -14,6 +14,7 @@ from starlette.testclient import TestClient  # noqa: E402
 
 from reposage.server.app import (  # noqa: E402
     _audit,
+    _audit_standards,
     _clone,
     _resolve_token,
     _validate_repo_url,
@@ -95,6 +96,21 @@ def test_audit_enrich_without_key_raises(tmp_path: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Unit: _audit_standards helper
+# ---------------------------------------------------------------------------
+
+
+def test_audit_standards_returns_graded_markdown() -> None:
+    from tests.conftest import fixture_path
+
+    result = _audit_standards(
+        fixture_path("standards/ds_passing_repo"), run_subprocess_checks=False
+    )
+    assert "# RepoSage Standards Audit" in result
+    assert "**Grade:" in result
+
+
+# ---------------------------------------------------------------------------
 # Unit: _clone argument safety (mocked subprocess)
 # ---------------------------------------------------------------------------
 
@@ -173,6 +189,16 @@ def test_clone_token_passed_as_auth_header_not_in_url(tmp_path: Path) -> None:
     # Token must not appear in the URL position
     url_idx = first_call_args.index("https://github.com/example/private")
     assert "ghp_test123" not in first_call_args[url_idx]
+
+
+def test_clone_full_depth_omits_depth_flag(tmp_path: Path) -> None:
+    dest = str(tmp_path / "repo")
+    with patch("reposage.server.app.subprocess.run") as mock_run:
+        mock_run.return_value = None
+        _clone("https://github.com/example/repo", "main", dest, depth=None)
+
+    first_call_args = mock_run.call_args_list[0][0][0]
+    assert "--depth" not in first_call_args
 
 
 def test_clone_without_token_excludes_auth_header(tmp_path: Path) -> None:

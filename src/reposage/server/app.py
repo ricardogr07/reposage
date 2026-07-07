@@ -86,21 +86,60 @@ def create_mcp_app() -> Starlette:
             finally:
                 shutil.rmtree(tmp, ignore_errors=True)
 
+    @mcp.tool()
+    async def audit_standards(
+        repo_url: str,
+        ref: str = "HEAD",
+        run_subprocess_checks: bool = False,
+        token: str | None = None,
+    ) -> str:
+        """Clone a remote Git repository and grade it against the Six Standards.
+
+        Args:
+            repo_url: HTTPS URL of the repository (e.g. https://github.com/org/repo).
+                      Only https:// URLs are accepted. Do not embed credentials in the URL.
+            ref: Branch name, tag, or commit SHA to audit. Defaults to HEAD.
+            run_subprocess_checks: Also run the opt-in subprocess checks (editable
+                                   install and the repository's own pytest suite).
+                                   This executes code from the audited repository
+                                   inside the server; leave False for untrusted repos.
+            token: Optional personal access token (PAT) or GitHub App token for private
+                   repositories. Falls back to the GITHUB_TOKEN environment variable.
+        """
+        with observe("audit_standards"):
+            _validate_repo_url(repo_url)
+            effective_token = _resolve_token(token)
+
+            tmp = tempfile.mkdtemp(prefix="reposage-")
+            try:
+                # Full-depth clone: commit-count and history-secret checks need
+                # real history, unlike the general report's shallow clone.
+                _clone(repo_url, ref, tmp, token=effective_token, depth=None)
+                return _audit_standards(Path(tmp), run_subprocess_checks=run_subprocess_checks)
+            finally:
+                shutil.rmtree(tmp, ignore_errors=True)
+
     app = mcp.streamable_http_app()
     app.routes.append(Route("/health", _health, methods=["GET"]))
     return app
 
 
-def _clone(repo_url: str, ref: str, dest: str, *, token: str | None = None) -> None:
-    """Clone repo_url at ref into dest. Falls back for non-branch refs."""
+def _clone(
+    repo_url: str, ref: str, dest: str, *, token: str | None = None, depth: int | None = 1
+) -> None:
+    """Clone repo_url at ref into dest. Falls back for non-branch refs.
+
+    ``depth=None`` clones full history (the standards audit reads git history).
+    """
     if token:
         b64 = base64.b64encode(f"x-access-token:{token}".encode()).decode()
         git_auth = ["-c", f"http.extraheader=Authorization: Basic {b64}"]
     else:
         git_auth = []
+    depth_args = [] if depth is None else ["--depth", str(depth)]
     try:
         subprocess.run(
-            ["git"] + git_auth + ["clone", "--depth", "1", "--branch", ref, repo_url, dest],
+            ["git"] + git_auth + ["clone", *depth_args, "--branch", ref, repo_url, dest],
             check=True,
             capture_output=True,
             timeout=120,
@@ -112,14 +151,15 @@ def _clone(repo_url: str, ref: str, dest: str, *, token: str | None = None) -> N
     # ref may be a commit SHA not supported by --branch; clone default then fetch ref
     shutil.rmtree(dest, ignore_errors=True)
     subprocess.run(
-        ["git"] + git_auth + ["clone", "--depth", "1", repo_url, dest],
+        ["git"] + git_auth + ["clone", *depth_args, repo_url, dest],
         check=True,
         capture_output=True,
         timeout=120,
     )
     if ref != "HEAD":
+        fetch_depth = [] if depth is None else ["--depth", str(depth)]
         subprocess.run(
-            ["git"] + git_auth + ["-C", dest, "fetch", "--depth", "1", "origin", ref],
+            ["git"] + git_auth + ["-C", dest, "fetch", *fetch_depth, "origin", ref],
             check=True,
             capture_output=True,
             timeout=60,
@@ -162,6 +202,18 @@ def _audit(root: Path, *, enrich: bool, enrich_provider: str = "anthropic") -> s
             enrichment = enrich_report(report, AnthropicEnricher())
 
     return render_markdown_report(report, enrichment=enrichment)
+
+
+def _audit_standards(root: Path, *, run_subprocess_checks: bool) -> str:
+    from dataclasses import replace
+
+    from reposage.reports.standards_markdown import render_standards_markdown
+    from reposage.standards.config import load_standards_config
+    from reposage.standards.pipeline import build_standards_report
+
+    config, _ = load_standards_config(root)
+    config = replace(config, run_subprocess_checks=run_subprocess_checks)
+    return render_standards_markdown(build_standards_report(root, config))
 
 
 async def _health(request: Request) -> JSONResponse:
